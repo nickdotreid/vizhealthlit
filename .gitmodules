@@ -1,0 +1,3 @@
+[submodule "vizhealthlit/static/bootstrap"]
+	path = vizhealthlit/static/bootstrap
+	url = https://github.com/twbs/bootstrap.git
