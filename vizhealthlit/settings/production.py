@@ -150,6 +150,7 @@ INSTALLED_APPS = (
     "south",
     "herokuapp",
     "crispy_forms",
+    "vizform",
 )
 
 
