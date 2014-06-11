@@ -6,6 +6,7 @@ from django.template import RequestContext
 
 from django import forms
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 
 class TextForm(forms.Form):
@@ -16,9 +17,16 @@ class TextForm(forms.Form):
         self.helper.form_method = "POST"
         self.helper.form_action = reverse(result)
 
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.form_class = 'form-horizontal'
+        self.helper.label_class = 'col-lg-2'
+        self.helper.field_class = 'col-lg-8'
 
-    text = forms.CharField(required=True, widget=forms.Textarea)
+        self.helper.layout = Layout(
+            'text',
+            Submit('submit', 'Submit'),
+            )
+
+    text = forms.CharField(label="The text you want to visualize", required=True, widget=forms.Textarea)
 
 
 def index(request):
