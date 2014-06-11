@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% crispy form %}
+<div id="results" class="results">
+	{% for d in data %}
+	{% with num=d.words %}
+	<div style="display:block;background-color:#000;margin:0px auto;height:20px;width:{% widthratio num longest 100 %}%;"></div>
+	{% endwith %}
+	{% endfor %}
+</div>
+{% endblock %}
