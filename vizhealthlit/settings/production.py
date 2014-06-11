@@ -160,6 +160,7 @@ STATICFILES_DIRS = (
     os.path.join(SITE_ROOT, "static"),
 )
 
+CRISPY_TEMPLATE_PACK='bootstrap'
 
 # Dispatch settings.
 
