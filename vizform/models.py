@@ -16,7 +16,7 @@ class Body():
     def word_meaning_sequence(self):
         meaning_sequence = []
         for t in self.text:
-            meaning_sequence.append(wordnet.synsets(t))
+            meaning_sequence.append(len(wordnet.synsets(t)))
         return meaning_sequence
 
     def __unicode__(self):

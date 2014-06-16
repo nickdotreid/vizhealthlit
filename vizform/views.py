@@ -1,6 +1,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+import json
 
 from django.template import RequestContext
 
@@ -46,7 +47,15 @@ def result(request):
         body = Body(form.cleaned_data['text'])
         data = parse_paragraph(form.cleaned_data['text'])
         longest = max([d['words'] for d in data])
-        print longest
+    if request.is_ajax():
+        return HttpResponse(
+            json.dumps({
+                'words':{
+                    'meanings': body.word_meaning_sequence()
+                },
+                }),
+            content_type="application/json"
+            )
     return render_to_response('results.html',{
         'form': form,
         'data':data,
