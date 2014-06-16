@@ -15,7 +15,8 @@ class Body():
 
     def word_meaning_sequence(self):
         meaning_sequence = []
-        for t in self.text:
+        for t in self.text.split(' '):
+            print t
             meaning_sequence.append(len(wordnet.synsets(t)))
         return meaning_sequence
 
