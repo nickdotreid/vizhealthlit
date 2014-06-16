@@ -9,6 +9,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 
+from vizform.models import Body
+
 class TextForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
@@ -41,6 +43,7 @@ def result(request):
     data = []
     longest = 1
     if form.is_valid():
+        body = Body(form.cleaned_data['text'])
         data = parse_paragraph(form.cleaned_data['text'])
         longest = max([d['words'] for d in data])
         print longest
