@@ -1,3 +1,6 @@
 [submodule "vizhealthlit/static/bootstrap"]
 	path = vizhealthlit/static/bootstrap
 	url = https://github.com/twbs/bootstrap.git
+[submodule "vizhealthlit/static/d3"]
+	path = vizhealthlit/static/d3
+	url = https://github.com/mbostock/d3.git
