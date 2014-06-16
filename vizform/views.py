@@ -51,7 +51,8 @@ def result(request):
         return HttpResponse(
             json.dumps({
                 'words':{
-                    'meanings': body.word_meaning_sequence()
+                    'meanings': body.word_meaning_sequence(),
+                    'stops':body.stop_word_sequence(),
                 },
                 }),
             content_type="application/json"
