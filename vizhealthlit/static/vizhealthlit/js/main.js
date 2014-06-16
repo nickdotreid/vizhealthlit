@@ -49,12 +49,19 @@ function draw_streams(data){
 		.attr("width", chart.width())
 		.attr("height", chart.height());
 
+	var x = d3.scale.linear()
+		.domain([0,data.length])
+		.range([0,chart.width()]);
+	var y = d3.scale.linear()
+		.domain([0,d3.max(data)])
+		.range([0,chart.height()]);
+
 	var num = 0;
 	var rect = svg.selectAll("rect")
 	    .data(data)
 	  .enter().append("rect")
-	    .attr("x", function(d) { num += 1; return num; })
-	    .attr("y", 0)
-	    .attr("width", 1)
-	    .attr("height", function(d){ return d; });
+	    .attr("x", function(d) { num += 1; return x(num-1); })
+	    .attr("y", function(d){ return chart.height() - y(d); })
+	    .attr("width", chart.width()/data.length)
+	    .attr("height", function(d){ return y(d); });
 }
