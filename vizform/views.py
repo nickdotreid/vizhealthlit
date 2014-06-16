@@ -53,6 +53,7 @@ def result(request):
                 'words':{
                     'meanings': body.word_meaning_sequence(),
                     'stops':body.stop_word_sequence(),
+                    'syllables':body.syllable_sequence(),
                 },
                 }),
             content_type="application/json"
