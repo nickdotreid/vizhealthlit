@@ -42,6 +42,12 @@ class Body():
                 sequence.append(0)
         return sequence
 
+    def tags(self):
+        tags = []
+        for w,t in nltk.FreqDist(self.words):
+            tags.append(t)
+        return tags
+
 
     def __unicode__(self):
         return self.text
