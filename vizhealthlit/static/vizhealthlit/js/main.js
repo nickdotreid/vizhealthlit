@@ -44,14 +44,22 @@ function draw_tree(data){
 	var chart=$("#chart");
 	chart.html("");
 
+	chart.height($('form').height());
+	chart.css("position","relative");
+
 	var newdata = [];
 	for(d in data){
 		newdata.push({
 			name:d,
-			size:data[d].length
+			size:data[d].length,
+			words:data[d],
+			children:[],
 		});
 	}
-	data = newdata;
+	data = {
+		name:"foozle",
+		children:newdata,
+	}
 
 	var color = d3.scale.category20();
 
@@ -73,9 +81,16 @@ function draw_tree(data){
 		.enter().append("div").attr('class','node')
 		.call(position)
 		.style('background-color',function(d){
-			return color(d)
+			return color(d.name);
 		})
-		.style('position','absolute');
+		.style('position','absolute')
+		.attr('data-words',function(d){ return d.words; })
+		.attr('data-name',function(d){ return d.name; });
+
+	$("#chart .node").click(function(event){
+		event.preventDefault();
+		alert($(this).data("name")+"\n"+$(this).data("words"));
+	});
 }
 
 function draw_streams(data){
