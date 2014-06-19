@@ -1,6 +1,6 @@
 from django.db import models
 
-from nltk import word_tokenize
+import nltk
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.corpus import cmudict
@@ -15,7 +15,7 @@ class Body():
 
     def __init__(self, text):
         self.text = text
-        self.words = word_tokenize(text)
+        self.words = nltk.word_tokenize(text)
 
     def word_meaning_sequence(self):
         meaning_sequence = []
@@ -43,9 +43,11 @@ class Body():
         return sequence
 
     def tags(self):
-        tags = []
-        for w,t in nltk.FreqDist(self.words):
-            tags.append(t)
+        tags = {}
+        for w,t in nltk.pos_tag(self.words):
+            if t not in tags:
+                tags[t] = []
+            tags[t].append(w)
         return tags
 
 

@@ -62,6 +62,7 @@ def result(request):
         return HttpResponse(
             json.dumps({
                 'words':words,
+                'tags':body.tags(),
                 }),
             content_type="application/json"
             )
@@ -70,22 +71,6 @@ def result(request):
         'data':data,
         'longest':longest,
         },context_instance=RequestContext(request))
-
-def tags(request):
-    if not request.POST and not request.is_ajax():
-        return HttpResponseRedirect(reverse(index))
-    form = TextForm(request.POST)
-    if not form.is_valid():
-        return HttpResponseRedirect(reverse(index))
-    body = Body(form.cleaned_data['text'])
-    return HttpResponse(
-        json.dumps({
-            'words':body.tags(),
-            }),
-        content_type="application/json"
-        )
-
-
 
 def parse_paragraph(text):
     sentences = [parse_sentence(s+'.') for s in text.split('. ')]
