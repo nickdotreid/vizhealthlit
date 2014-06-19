@@ -12,16 +12,11 @@ $.ajaxSetup({
     }
 });
 
-$(window).resize(function(){
-	var form = $('form');
-	form.css({
-		float:'left',
-	});
-	var chart = $('#chart');
-	chart.css({
-		float:'left',
-		height:form.height(),
-		width:form.parent().width() - form.width(),
+$(document).ready(function(){
+	$('.control-viz a').click(function(event){
+		event.preventDefault();
+		$('.active',$(this).parents('.control-viz')).removeClass("active");
+		$(this).parent().addClass('active');
 	});
 });
 
@@ -35,11 +30,53 @@ $(document).ready(function(){
 			type: form.attr("method"),
 			data:form.serializeArray(),
 			success:function(data){
-				draw_streams(data['words']);
+				if($('.control-viz .active').data('viz-type')=='tree'){
+					draw_tree(data['tags']);
+				}else{
+					draw_streams(data['words']);
+				}
 			},
 		});
 	});
 });
+
+function draw_tree(data){
+	var chart=$("#chart");
+	chart.html("");
+
+	var newdata = [];
+	for(d in data){
+		newdata.push({
+			name:d,
+			size:data[d].length
+		});
+	}
+	data = newdata;
+
+	var color = d3.scale.category20();
+
+	var treemap = d3.layout.treemap()
+	    .size([chart.width(), chart.height()])
+	    .sticky(true)
+	    .value(function(d) { return d.size; });
+
+	function position() {
+  	this.style("left", function(d) { return d.x + "px"; })
+      .style("top", function(d) { return d.y + "px"; })
+      .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
+      .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
+	}
+
+	var div = d3.select("#chart");
+	div.datum(data).selectAll('.node')
+		.data(treemap.nodes)
+		.enter().append("div").attr('class','node')
+		.call(position)
+		.style('background-color',function(d){
+			return color(d)
+		})
+		.style('position','absolute');
+}
 
 function draw_streams(data){
 	var chart=$("#chart");
