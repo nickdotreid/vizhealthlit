@@ -35,12 +35,15 @@ class Paragraph(models.Model):
 
     text = ""
     sentences = []
+    words = []
 
     def __init__(self, text):
         self.text = text
 
         for sent in sent_detector.tokenize(self.text.strip()):
-            self.sentences.append(Sentence(sent))
+            s = Sentence(sent)
+            self.sentences.append(s)
+            self.words += s.words
     
     def __unicode__(self):
         return self.text

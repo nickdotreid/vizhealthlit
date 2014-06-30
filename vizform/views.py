@@ -48,26 +48,18 @@ def result(request):
     if form.is_valid():
         body = Body(form.cleaned_data['text'])
         data = parse_paragraph(form.cleaned_data['text'])
-        longest = max([d['words'] for d in data])
-    if request.is_ajax():
-        meanings = body.word_meaning_sequence()
-        stops = body.stop_word_sequence()
-        syllables = body.syllable_sequence()
-        words = []
-        for i in range(len(body.words)):
-            words.append({
-                'meanings':meanings[i],
-                'stops':stops[i],
-                'syllables':syllables[i],
-                'word':body.words[i],
-                })
-        return HttpResponse(
-            json.dumps({
-                'words':words,
-                'tags':body.tags(),
-                }),
-            content_type="application/json"
-            )
+        if form.cleaned_data['style'] == 'sentences':
+            longest = max([len(p.words) for p in body.sentences])
+        else:
+            longest = max([len(p.words) for p in body.paragraphs])
+        if request.is_ajax():
+
+            return HttpResponse(
+                json.dumps({
+
+                    }),
+                content_type="application/json"
+                )
     return render_to_response('results.html',{
         'form': form,
         'data':data,
