@@ -1,9 +1,49 @@
 from django.db import models
 
 import nltk
+import nltk.data
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.corpus import cmudict
+
+sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+
+class Sentence(models.Model):
+    class Meta:
+        abstract = True
+
+    text = ""
+    words = []
+    verbs = []
+    nouns = []
+
+    def __init__(self, text):
+        self.text = text
+        self.words = nltk.word_tokenize(text)
+        # count nouns
+        # count verbs
+
+        # check positivity
+        # check active voice
+
+    def __unicode__(self):
+        return self.text
+
+class Paragraph(models.Model):
+    class Meta:
+        abstract = True
+
+    text = ""
+    sentences = []
+
+    def __init__(self, text):
+        self.text = text
+
+        for sent in sent_detector.tokenize(self.text.strip()):
+            self.sentences.append(Sentence(sent))
+    
+    def __unicode__(self):
+        return self.text
 
 class Body():
 
@@ -12,10 +52,18 @@ class Body():
     
     text = ""
     verbs = {}
+    paragraphs = []
+    sentences = []
 
     def __init__(self, text):
         self.text = text
         self.words = nltk.word_tokenize(text)
+        for para in self.text.split('\n'):
+            paragraph = Paragraph(para)
+            self.paragraphs.append(paragraph)
+            self.sentences += paragraph.sentences
+        print self.paragraphs
+        print self.sentences
 
     def word_meaning_sequence(self):
         meaning_sequence = []
