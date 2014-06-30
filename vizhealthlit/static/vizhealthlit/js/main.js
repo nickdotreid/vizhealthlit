@@ -30,15 +30,22 @@ $(document).ready(function(){
 			type: form.attr("method"),
 			data:form.serializeArray(),
 			success:function(data){
-				if($('.control-viz .active').data('viz-type')=='tree'){
-					draw_tree(data['tags']);
-				}else{
-					draw_streams(data['words']);
-				}
+				draw_bars(data);
 			},
 		});
 	});
 });
+
+function draw_bars(data){
+	var chart=$("#chart");
+	chart.html("");
+
+	var color = d3.scale.category10();
+
+	var svg = d3.select("#chart").append("svg:svg")
+		.attr("width", chart.width())
+		.attr("height", chart.height());
+}
 
 function draw_tree(data){
 	var chart=$("#chart");

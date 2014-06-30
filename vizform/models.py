@@ -62,8 +62,6 @@ class Body():
             paragraph = Paragraph(para)
             self.paragraphs.append(paragraph)
             self.sentences += paragraph.sentences
-        print self.paragraphs
-        print self.sentences
 
     def word_meaning_sequence(self):
         meaning_sequence = []

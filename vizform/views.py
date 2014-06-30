@@ -26,10 +26,12 @@ class TextForm(forms.Form):
 
         self.helper.layout = Layout(
             'text',
+            'style',
             Submit('submit', 'Submit'),
             )
 
     text = forms.CharField(label="The text you want to visualize", required=True, widget=forms.Textarea)
+    style = forms.ChoiceField(label="Pick a layout", required=True, widget=forms.RadioSelect, choices=(('paragraph','Paragraph'),('sentences','Sentences')))
 
 
 def index(request):
