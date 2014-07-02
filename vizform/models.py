@@ -12,93 +12,82 @@ class Sentence(models.Model):
     class Meta:
         abstract = True
 
-    text = ""
-    words = []
-    verbs = []
-    nouns = []
-
     def __init__(self, text):
         self.text = text
+        
+        self.words = []
+        self.nouns = []
+        self.verbs = []
+        self.active_words = []
+        self.passive_words = []
+
         self.words = nltk.word_tokenize(text)
-        # count nouns
-        # count verbs
+
+        tags = nltk.pos_tag(self.words)
+
+        for w,t in tags:
+            if 'N' in t:
+                self.nouns.append(w)
+            if 'V' in t:
+                self.verbs.append(w)
+            if t in ['PRO','VG','MOD']:
+                self.active_words.append(w)
+            if t in ['VD','VN']:
+                self.passive_words.append(w)
 
         # check positivity
         # check active voice
 
+    def to_json(self):
+        return {
+            'length':len(self.words),
+            'words':self.words,
+            'text':self.text,
+            'score':len(self.nouns) - len(self.verbs)
+        }
+
     def __unicode__(self):
         return self.text
 
-class Paragraph(models.Model):
-    class Meta:
-        abstract = True
+class Paragraph(Sentence):
 
-    text = ""
     sentences = []
-    words = []
 
     def __init__(self, text):
         self.text = text
+        self.words = []
+        self.nouns = []
+        self.verbs = []
+        self.active_words = []
+        self.passive_words = []
 
+        self.sentences = []
         for sent in sent_detector.tokenize(self.text.strip()):
             s = Sentence(sent)
             self.sentences.append(s)
             self.words += s.words
-    
-    def __unicode__(self):
-        return self.text
+            self.active_words += s.nouns
+            self.passive_words += s.verbs
 
-class Body():
+class Body(Paragraph):
 
-    class Meta:
-       abstract = True
-    
-    text = ""
-    verbs = {}
     paragraphs = []
-    sentences = []
 
     def __init__(self, text):
         self.text = text
-        self.words = nltk.word_tokenize(text)
-        for para in self.text.split('\n'):
-            paragraph = Paragraph(para)
-            self.paragraphs.append(paragraph)
-            self.sentences += paragraph.sentences
+        
+        self.paragraphs = []
+        self.sentences = []
+        self.words = []
+        self.nouns = []
+        self.verbs = []
+        self.active_words = []
+        self.passive_words = []
 
-    def word_meaning_sequence(self):
-        meaning_sequence = []
-        for t in self.words:
-            meaning_sequence.append(len(wordnet.synsets(t)))
-        return meaning_sequence
-
-    def stop_word_sequence(self):
-        stop_word_sequence = []
-        for t in self.words:
-            if t in stopwords.words('english'):
-                stop_word_sequence.append(1)
-            else:
-                stop_word_sequence.append(0)
-        return stop_word_sequence
-
-    def syllable_sequence(self):
-        sequence = []
-        prondict = cmudict.dict()
-        for t in self.words:
-            if t in prondict and len(prondict[t]) > 0:
-                sequence.append(len(prondict[t][0]))
-            else:
-                sequence.append(0)
-        return sequence
-
-    def tags(self):
-        tags = {}
-        for w,t in nltk.pos_tag(self.words):
-            if t not in tags:
-                tags[t] = []
-            tags[t].append(w)
-        return tags
-
-
-    def __unicode__(self):
-        return self.text
+        for para in self.text.split('\n\r'):
+            p = Paragraph(para)
+            self.paragraphs.append(p)
+            self.sentences += p.sentences
+            self.words += p.words
+            self.active_words += p.active_words
+            self.passive_words += p.passive_words

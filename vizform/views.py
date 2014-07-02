@@ -45,21 +45,21 @@ def result(request):
     form = TextForm(request.POST)
     data = []
     longest = 1
-    if form.is_valid():
+    if form.is_valid() and request.is_ajax():
+        print len(form.cleaned_data['text'])
+        print "~~~~"
         body = Body(form.cleaned_data['text'])
-        data = parse_paragraph(form.cleaned_data['text'])
+        items = []
         if form.cleaned_data['style'] == 'sentences':
-            longest = max([len(p.words) for p in body.sentences])
+            items = body.sentences
         else:
-            longest = max([len(p.words) for p in body.paragraphs])
-        if request.is_ajax():
-
-            return HttpResponse(
-                json.dumps({
-
-                    }),
-                content_type="application/json"
-                )
+            items = body.paragraphs
+        return HttpResponse(
+            json.dumps({
+                'items':[item.to_json() for item in items],
+                }),
+            content_type="application/json"
+            )
     return render_to_response('results.html',{
         'form': form,
         'data':data,
