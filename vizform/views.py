@@ -76,11 +76,7 @@ def result(request):
             content_type="application/json"
             )
         body = Body(form.cleaned_data['text'])
-        items = []
-        if form.cleaned_data['style'] == 'sentences':
-            items = body.sentences
-        else:
-            items = body.paragraphs
+        items = body.paragraphs
         return HttpResponse(
             json.dumps({
                 'items':[item.to_json() for item in items],

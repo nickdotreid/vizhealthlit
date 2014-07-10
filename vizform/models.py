@@ -68,6 +68,10 @@ class Paragraph(Sentence):
             self.words += s.words
             self.nouns += s.nouns
             self.verbs += s.verbs
+    def to_json(self):
+        obj = super(Paragraph, self).to_json()
+        obj['sentences'] = [s.to_json() for s in self.sentences]
+        return obj
 
 class Body(Paragraph):
 
