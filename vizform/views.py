@@ -10,6 +10,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 
+from crispy_forms.utils import render_crispy_form
+
 from vizform.models import Body
 
 class TextForm(forms.Form):
@@ -31,10 +33,10 @@ class TextForm(forms.Form):
             )
 
     text = forms.CharField(label="The text you want to visualize", required=True, widget=forms.Textarea)
-    style = forms.ChoiceField(label="Pick a layout", required=True, widget=forms.RadioSelect, 
+    style = forms.ChoiceField(label="Pick a layout", required=True, 
         choices=(
-        ('paragraph','Paragraph'),
-        ('sentences','Sentences'),
+        ('bars','Bar Chart'),
+        ('tree','Tree Map'),
         ))
 
 class SettingsForm(TextForm):
@@ -50,9 +52,9 @@ class SettingsForm(TextForm):
             Submit('submit', 'Submit'),
             )
 
-    words_threshold = forms.CharField(label="Words", initial=10)
-    sentences_threshold = forms.CharField(label="Sentences", initial=5)
-    negativity_threshold = forms.CharField(label="Negativity", initial=1)
+    words_threshold = forms.CharField(required=False, label="Words", initial=10)
+    sentences_threshold = forms.CharField(required=False, label="Sentences", initial=5)
+    negativity_threshold = forms.CharField(required=False, label="Negativity", initial=1)
 
 def index(request):
     return render_to_response('index.html',{
@@ -65,7 +67,14 @@ def result(request):
     form = TextForm(request.POST)
     data = []
     longest = 1
-    if form.is_valid() and request.is_ajax():
+    if request.is_ajax():
+        if not form.is_valid():
+            return HttpResponse(
+            json.dumps({
+                'form':render_crispy_form(SettingsForm(request.POST), context=RequestContext(request)),
+                }),
+            content_type="application/json"
+            )
         body = Body(form.cleaned_data['text'])
         items = []
         if form.cleaned_data['style'] == 'sentences':

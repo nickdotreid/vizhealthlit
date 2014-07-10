@@ -12,6 +12,27 @@ $.ajaxSetup({
     }
 });
 
+// FROM:: http://stackoverflow.com/questions/1184624/convert-form-data-to-js-object-with-jquery
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+
+
+var visualization_functions = {};
+
 $(document).ready(function(){
 	$('.control-viz a').click(function(event){
 		event.preventDefault();
@@ -22,7 +43,7 @@ $(document).ready(function(){
 
 $(document).ready(function(){
 	$(window).resize();
-	$('form').submit(function(event){
+	$('body').delegate('form','submit',function(event){
 		event.preventDefault();
 		var form = $(this);
 		$.ajax({
@@ -30,131 +51,29 @@ $(document).ready(function(){
 			type: form.attr("method"),
 			data:form.serializeArray(),
 			success:function(data){
-				draw_bars(data['items']);
+				if(data['form']){
+					form.after(data['form']);
+					form.remove();
+				}
+				if(data['items']){
+					form.data('items',data['items']);
+					draw(data['items'],form.serializeObject());
+				}
 			},
 		});
+	}).delegate('form input,form select','change',function(){
+		var form = $(this).parents("form");
+		if(form.data('items')){
+			draw(form.data('items'),form.serializeObject());
+		}
 	});
 });
 
-function draw_bars(data){
-	var barHeight=20;
-
-	var chart=$("#chart");
-	chart.html("");
-	chart.height(barHeight*data.length);
-
-	var color = d3.scale.category10();
-
-	var svg = d3.select("#chart").append("svg:svg")
-		.attr("width", chart.width())
-		.attr("height", chart.height());
-
-	var x = d3.scale.linear().domain([
-		d3.min(data,function(d){ return d.length; }),
-		d3.max(data, function(d){ return d.length; })
-		]).range([
-			0,
-			chart.width()
-		]);
-	
-	var bars = svg.selectAll("g").data(data).enter().append("g")
-		.attr("transform", function(d,i){
-		return "translate(0,"+barHeight*i+")";
-	});
-	bars.append("rect").attr({
-		height:barHeight,
-		width:function(d){
-			return x(d.length);
-		},
-		fill:function(d){
-			return color(d.score);
-		},
-	});
-}
-
-function draw_tree(data){
-	var chart=$("#chart");
-	chart.html("");
-
-	chart.height($('form').height());
-	chart.css("position","relative");
-
-	var newdata = [];
-	for(d in data){
-		newdata.push({
-			name:d,
-			size:data[d].length,
-			words:data[d],
-			children:[],
-		});
+function draw(items, settings){
+	$("#chart").html("");
+	if(visualization_functions[settings['style']]){
+		visualization_functions[settings['style']](items,settings);
+	}else{
+		alert("no draw funciton");
 	}
-	data = {
-		name:"foozle",
-		children:newdata,
-	}
-
-	var color = d3.scale.category20();
-
-	var treemap = d3.layout.treemap()
-	    .size([chart.width(), chart.height()])
-	    .sticky(true)
-	    .value(function(d) { return d.size; });
-
-	function position() {
-  	this.style("left", function(d) { return d.x + "px"; })
-      .style("top", function(d) { return d.y + "px"; })
-      .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
-      .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
-	}
-
-	var div = d3.select("#chart");
-	div.datum(data).selectAll('.node')
-		.data(treemap.nodes)
-		.enter().append("div").attr('class','node')
-		.call(position)
-		.style('background-color',function(d){
-			return color(d.name);
-		})
-		.style('position','absolute')
-		.attr('data-words',function(d){ return d.words; })
-		.attr('data-name',function(d){ return d.name; });
-
-	$("#chart .node").click(function(event){
-		event.preventDefault();
-		alert($(this).data("name")+"\n"+$(this).data("words"));
-	});
-}
-
-function draw_streams(data){
-	var chart=$("#chart");
-	chart.html("");
-
-	var color = d3.scale.category10();
-
-	var svg = d3.select("#chart").append("svg:svg")
-		.attr("width", chart.width())
-		.attr("height", chart.height());
-
-	var val = function(d){
-		return d.meanings + d.syllables;
-	}
-
-	var x = d3.scale.linear()
-		.domain([0,data.length])
-		.range([0,chart.width()]);
-	var y = d3.scale.linear()
-		.domain([d3.min(data, val),d3.max(data, val)])
-		.range([0,chart.height()]);
-
-	var num = 0;
-	var rect = svg.selectAll("rect")
-	    .data(data)
-	  .enter().append("rect")
-	    .attr("x", function(d) { num += 1; return x(num-1); })
-	    .attr("y", function(d){ return chart.height()/2 - y(val(d))/2; })
-	    .attr("width", chart.width()/data.length)
-	    .attr("height", function(d){ return y(val(d)); })
-	    .attr("fill", function(d){
-	    	return color(d.stops);
-	    });
 }
