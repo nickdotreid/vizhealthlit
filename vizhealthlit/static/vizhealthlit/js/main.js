@@ -71,6 +71,7 @@ $(document).ready(function(){
 
 function draw(items, settings){
 	$("#chart").html("");
+	$("#chart").height($(window).height()-$(".navbar").height());
 	if(visualization_functions[settings['style']]){
 		visualization_functions[settings['style']](items,settings);
 	}else{

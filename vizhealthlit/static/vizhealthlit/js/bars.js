@@ -1,12 +1,8 @@
 function draw_bars(data){
 	var barHeight=20;
-
-	var chart=$("#chart");
-	chart.html("");
-	chart.height(barHeight*data.length);
-
 	var color = d3.scale.category10();
 
+	var chart = $("#chart");
 	var svg = d3.select("#chart").append("svg:svg")
 		.attr("width", chart.width())
 		.attr("height", chart.height());
@@ -16,7 +12,7 @@ function draw_bars(data){
 		d3.max(data, function(d){ return d.length; })
 		]).range([
 			0,
-			chart.width()
+			chart.height()/2
 		]);
 	
 	var bars = svg.selectAll("g").data(data).enter().append("g")
