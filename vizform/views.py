@@ -50,9 +50,9 @@ class SettingsForm(TextForm):
             Submit('submit', 'Submit'),
             )
 
-    words_threshold = forms.CharField(label="Words")
-    sentences_threshold = forms.CharField(label="Sentences")
-    negativity_threshold = forms.CharField(label="Negativity")
+    words_threshold = forms.CharField(label="Words", initial=10)
+    sentences_threshold = forms.CharField(label="Sentences", initial=5)
+    negativity_threshold = forms.CharField(label="Negativity", initial=1)
 
 def index(request):
     return render_to_response('index.html',{
