@@ -25,7 +25,8 @@ function draw_bars(items){
 		});
 	});
 	var barWidth = chart.width()/sentences.length;
-	var items = svg.selectAll("g").data(items).enter().append("g");
+	var canvas = svg.append("g");
+	var items = canvas.selectAll("g").data(items).enter().append("g");
 
 
 	items.selectAll("rect").data(function(d){
@@ -54,6 +55,18 @@ function draw_bars(items){
 				return ypos - this.getBBox().height;
 			}
 		})
+	});
+
+	var xpos = 0;
+	items.attr("transform",function(d){
+		xpos += this.getBBox().width;
+		return "translate("+(xpos - this.getBBox().width)+","+0+")";
+	});
+	
+	canvas.attr("transform",function(){
+		if(display_paragraphs){
+			return "translate("+(chart.width()/2 - this.getBBox().width/2)+",0)"
+		}
 	});
 }
 
