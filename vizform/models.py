@@ -66,8 +66,8 @@ class Paragraph(Sentence):
             s = Sentence(sent)
             self.sentences.append(s)
             self.words += s.words
-            self.active_words += s.nouns
-            self.passive_words += s.verbs
+            self.nouns += s.nouns
+            self.verbs += s.verbs
 
 class Body(Paragraph):
 

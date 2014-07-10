@@ -31,12 +31,32 @@ class TextForm(forms.Form):
             )
 
     text = forms.CharField(label="The text you want to visualize", required=True, widget=forms.Textarea)
-    style = forms.ChoiceField(label="Pick a layout", required=True, widget=forms.RadioSelect, choices=(('paragraph','Paragraph'),('sentences','Sentences')))
+    style = forms.ChoiceField(label="Pick a layout", required=True, widget=forms.RadioSelect, 
+        choices=(
+        ('paragraph','Paragraph'),
+        ('sentences','Sentences'),
+        ))
 
+class SettingsForm(TextForm):
+    def __init__(self, *args, **kwargs):
+        super(SettingsForm, self).__init__(*args, **kwargs)
+
+        self.helper.layout = Layout(
+            'text',
+            'style',
+            'words_threshold',
+            'sentences_threshold',
+            'negativity_threshold',
+            Submit('submit', 'Submit'),
+            )
+
+    words_threshold = forms.CharField(label="Words")
+    sentences_threshold = forms.CharField(label="Sentences")
+    negativity_threshold = forms.CharField(label="Negativity")
 
 def index(request):
     return render_to_response('index.html',{
-        'form':TextForm,
+        'form':SettingsForm(),
         },context_instance=RequestContext(request))
 
 def result(request):
@@ -46,8 +66,6 @@ def result(request):
     data = []
     longest = 1
     if form.is_valid() and request.is_ajax():
-        print len(form.cleaned_data['text'])
-        print "~~~~"
         body = Body(form.cleaned_data['text'])
         items = []
         if form.cleaned_data['style'] == 'sentences':

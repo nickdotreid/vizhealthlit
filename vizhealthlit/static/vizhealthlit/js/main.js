@@ -66,7 +66,9 @@ function draw_bars(data){
 		width:function(d){
 			return x(d.length);
 		},
-		fill:"#000000",
+		fill:function(d){
+			return color(d.score);
+		},
 	});
 }
 
