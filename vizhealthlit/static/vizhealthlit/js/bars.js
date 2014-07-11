@@ -33,47 +33,59 @@ function draw_bars(items){
 	var canvas = svg.append("g");
 	var items = canvas.selectAll("g").data(items).enter().append("g");
 
-
-	items.selectAll("rect").data(function(d){
-		return d.sentences;
-	}).enter().append("rect").attr({
-		width:barWidth,
-		height:function(d){
-			return y(d.length);
-		},
-		fill:function(d){
-			return color(d.score);
-		},
-	});
-	items[0].forEach(function(d){
-		ypos=0;
-		xpos=0;
-		d3.select(d).selectAll("rect").attr({
-			x:function(d){
-				if(display_paragraphs) return 0;
-				xpos += barWidth;
-				return xpos - barWidth;
+	function blit(){
+		items.selectAll("rect").data(function(d){
+			return d.sentences;
+		}).enter().append("rect").attr({
+			width:barWidth,
+			height:function(d){
+				return y(d.length);
 			},
-			y:function(d){
-				if(!display_paragraphs) return this.getBBox().height/2;
-				ypos += this.getBBox().height;
-				return ypos - this.getBBox().height;
-			}
-		})
-	});
+			fill:function(d){
+				return color(d.score);
+			},
+		});
+		items[0].forEach(function(d){
+			ypos=0;
+			xpos=0;
+			d3.select(d).selectAll("rect").attr({
+				x:function(d){
+					if(display_paragraphs) return 0;
+					xpos += barWidth;
+					return xpos - barWidth;
+				},
+				y:function(d){
+					if(!display_paragraphs) return this.getBBox().height/2;
+					ypos += this.getBBox().height;
+					return ypos - this.getBBox().height;
+				}
+			})
+		});
 
-	var xpos = 0;
-	items.attr("transform",function(d){
-		xpos += this.getBBox().width;
-		return "translate("+(xpos - this.getBBox().width)+","+0+")";
-	});
-	
-	canvas.attr("transform",function(){
+		var xpos = 0;
+		items.attr("transform",function(d){
+			xpos += this.getBBox().width;
+			return "translate("+(xpos - this.getBBox().width)+","+0+")";
+		});
+		
+		canvas.attr("transform",function(){
+			if(display_paragraphs){
+				return "translate("+(chart.width()/2 - this.getBBox().width/2)+",0)";
+			}
+			return "translate(0,0)";
+		});		
+	}
+
+	blit();
+
+	chart.delegate('rect','click',function(){
 		if(display_paragraphs){
-			return "translate("+(chart.width()/2 - this.getBBox().width/2)+",0)";
+			display_paragraphs = false;
+		}else{
+			display_paragraphs = true;
 		}
-		return "translate(0,0)";
-	});
+		blit();
+	})
 }
 
 visualization_functions['bars'] = draw_bars;
