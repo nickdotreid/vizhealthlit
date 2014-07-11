@@ -45,6 +45,20 @@ function draw_bars(items){
 				return color(d.score);
 			},
 		});
+
+		var momentum = 0;
+		function scoreJitter(d){
+			var score = 0;
+			if(d.sentences){
+				if( 3 <= d.sentences.length <= 5) score += 1;
+			}else{
+				if( 8 <= d.words.length <= 10) score += 1;
+			}
+
+			return score;
+
+		}
+
 		items[0].forEach(function(d){
 			ypos=0;
 			xpos=0;
@@ -55,9 +69,14 @@ function draw_bars(items){
 					return xpos - barWidth;
 				},
 				y:function(d){
-					if(!display_paragraphs) return 0-this.getBBox().height/2;
+					if(!display_paragraphs){
+						y = 0-this.getBBox().height/2;
+						y += this.getBBox().height/4 * scoreJitter(d);
+						return y;
+					}  
+					var y = ypos;
 					ypos += this.getBBox().height;
-					return ypos - this.getBBox().height;
+					return y;
 				}
 			})
 		});
@@ -65,7 +84,8 @@ function draw_bars(items){
 		var xpos = 0;
 		items.attr("transform",function(d){
 			y = 0;
-			if(display_paragraphs) y = 0-this.getBBox().height/2;
+			if(display_paragraphs) y = 0-this.getBBox().height/2 ;
+			if(display_paragraphs) y += this.getBBox().height/4 * scoreJitter(d);
 			var translate = "translate("+xpos+","+y+")";
 			xpos += this.getBBox().width;
 			return translate;
