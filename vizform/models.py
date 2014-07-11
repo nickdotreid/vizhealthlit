@@ -30,9 +30,9 @@ class Sentence(models.Model):
                 self.nouns.append(w)
             if 'V' in t:
                 self.verbs.append(w)
-            if t in ['PRO','VG','MOD']:
+            if t in ['PRP','VBG']:
                 self.active_words.append(w)
-            if t in ['VD','VN']:
+            if t in ['VBD']:
                 self.passive_words.append(w)
 
         # check positivity
@@ -43,7 +43,7 @@ class Sentence(models.Model):
             'length':len(self.words),
             'words':self.words,
             'text':self.text,
-            'score':len(self.nouns) - len(self.verbs)
+            'score':len(self.active_words) - len(self.passive_words)
         }
 
     def __unicode__(self):

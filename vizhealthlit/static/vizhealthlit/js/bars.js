@@ -2,7 +2,19 @@ function draw_bars(items){
 
 	var display_paragraphs = true;
 
-	var color = d3.scale.category10();
+	var sentences = []
+	items.forEach(function(d){
+		d.sentences.forEach(function(s){
+			s.paragraph = d;
+			sentences.push(s);
+		});
+	});
+
+	var color = d3.scale.linear()
+	.domain([
+		d3.min(sentences,function(d){ return d.score; }),
+		d3.max(sentences,function(d){ return d.score; })
+	]).range(['#004636','#779492']);
 
 	var chart = $("#chart");
 	var svg = d3.select("#chart").append("svg:svg")
@@ -17,13 +29,6 @@ function draw_bars(items){
 			chart.height()/2
 		]);
 	
-	var sentences = []
-	items.forEach(function(d){
-		d.sentences.forEach(function(s){
-			s.paragraph = d;
-			sentences.push(s);
-		});
-	});
 	var barWidth = chart.width()/sentences.length;
 	var canvas = svg.append("g");
 	var items = canvas.selectAll("g").data(items).enter().append("g");
@@ -65,8 +70,9 @@ function draw_bars(items){
 	
 	canvas.attr("transform",function(){
 		if(display_paragraphs){
-			return "translate("+(chart.width()/2 - this.getBBox().width/2)+",0)"
+			return "translate("+(chart.width()/2 - this.getBBox().width/2)+",0)";
 		}
+		return "translate(0,0)";
 	});
 }
 
