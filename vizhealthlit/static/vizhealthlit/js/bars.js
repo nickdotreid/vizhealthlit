@@ -55,7 +55,7 @@ function draw_bars(items){
 					return xpos - barWidth;
 				},
 				y:function(d){
-					if(!display_paragraphs) return this.getBBox().height/2;
+					if(!display_paragraphs) return 0-this.getBBox().height/2;
 					ypos += this.getBBox().height;
 					return ypos - this.getBBox().height;
 				}
@@ -64,15 +64,17 @@ function draw_bars(items){
 
 		var xpos = 0;
 		items.attr("transform",function(d){
+			y = 0;
+			if(display_paragraphs) y = 0-this.getBBox().height/2;
+			var translate = "translate("+xpos+","+y+")";
 			xpos += this.getBBox().width;
-			return "translate("+(xpos - this.getBBox().width)+","+0+")";
+			return translate;
 		});
 		
 		canvas.attr("transform",function(){
-			if(display_paragraphs){
-				return "translate("+(chart.width()/2 - this.getBBox().width/2)+",0)";
-			}
-			return "translate(0,0)";
+			var x = chart.width()/2 - this.getBBox().width/2;
+			var y = chart.height()/2 - this.getBBox().height/2;
+			return "translate("+ x +","+ y +")";
 		});		
 	}
 
