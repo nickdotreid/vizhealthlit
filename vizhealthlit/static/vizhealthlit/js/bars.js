@@ -1,4 +1,4 @@
-function draw_bars(items){
+function draw_bars(items, settings){
 
 	var display_paragraphs = true;
 
@@ -30,7 +30,15 @@ function draw_bars(items){
 		]);
 	
 	var barWidth = chart.width()/sentences.length;
+	svg.append("rect").attr({
+		x:0,
+		y:chart.height()/2,
+		width:chart.width(),
+		height:chart.height()/2,
+		fill:"#f5f5f5",
+	})
 	var canvas = svg.append("g");
+	
 	var items = canvas.selectAll("g").data(items).enter().append("g");
 
 	function blit(){
@@ -52,7 +60,10 @@ function draw_bars(items){
 			if(d.sentences){
 				if( 3 <= d.sentences.length <= 5) score += 1;
 			}else{
-				if( 8 <= d.words.length <= 10) score += 1;
+				if(
+					(!settings['words_threshold_min'] || settings['words_threshold_min'] == "" || settings['words_threshold_min'] <= d.words.length)
+					&& (!settings['words_threshold_max'] || settings['words_threshold_max'] == "" || settings['words_threshold_max'] >= d.words.length)
+					) score += 1;
 			}
 
 			return score;

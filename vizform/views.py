@@ -7,8 +7,7 @@ from django.template import RequestContext
 
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Layout, Div, Submit
 
 from crispy_forms.utils import render_crispy_form
 
@@ -46,13 +45,19 @@ class SettingsForm(TextForm):
         self.helper.layout = Layout(
             'text',
             'style',
-            'words_threshold',
+            Div(
+                Div('words_threshold_min', css_class="col-md-6"),
+                Div('words_threshold_max', css_class="col-md-6"),
+                css_class="row"
+                ),
             'sentences_threshold',
             'negativity_threshold',
             Submit('submit', 'Submit'),
             )
 
-    words_threshold = forms.CharField(required=False, label="Words", initial=10)
+    words_threshold_min = forms.CharField(required=False, label="Min", initial=8)
+    words_threshold_max = forms.CharField(required=False, label="Max", initial=10)
+
     sentences_threshold = forms.CharField(required=False, label="Sentences", initial=5)
     negativity_threshold = forms.CharField(required=False, label="Negativity", initial=1)
 
