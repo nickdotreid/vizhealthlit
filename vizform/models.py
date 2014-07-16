@@ -8,6 +8,34 @@ from nltk.corpus import cmudict
 
 sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 
+class Noun():
+    def __init__(self, word, tag=False):
+        self.word = word
+        self.tag = tag
+        self.count = 0
+
+        self.verbs = []
+        self.modifiers = []
+        
+        self.defined = False
+
+    def score(self):
+        return 1
+
+    def merge(self, noun):
+        self.count += noun.count
+        
+        # This should be smarter? Maybe Count??
+        self.verbs += noun.verbs
+        self.modifiers += noun.modifiers
+
+        if noun.defined:
+            self.defined = True
+        return self
+
+    def __unicode__(self):
+        return "%s (%d)" % (self.word,self.count)
+
 class Sentence(models.Model):
     class Meta:
         abstract = True
@@ -16,20 +44,32 @@ class Sentence(models.Model):
         self.text = text
         
         self.words = []
-        self.nouns = []
-        self.verbs = []
+        self.nouns = {}
+        self.verbs = {}
+
         self.active_words = []
         self.passive_words = []
+        
+        self.direct_words = []
+        self.indirect_words = []
+
+        self.negative_words = []
 
         self.words = nltk.word_tokenize(text)
 
         tags = nltk.pos_tag(self.words)
 
         for w,t in tags:
-            if 'N' in t:
-                self.nouns.append(w)
+            if 'NN' in t:
+                if w not in self.nouns:
+                    self.nouns[w] = Noun(w,t)
+                self.nouns[w].count += 1
             if 'V' in t:
-                self.verbs.append(w)
+                if w not in self.verbs:
+                    self.verbs[w] = {
+                        'count': 0,
+                    }
+                self.verbs[w]['count'] += 1
             if t in ['PRP','VBG']:
                 self.active_words.append(w)
             if t in ['VBD']:
@@ -55,9 +95,11 @@ class Paragraph(Sentence):
 
     def __init__(self, text):
         self.text = text
+        
         self.words = []
-        self.nouns = []
-        self.verbs = []
+        self.nouns = {}
+        self.verbs = {}
+
         self.active_words = []
         self.passive_words = []
 
@@ -66,8 +108,14 @@ class Paragraph(Sentence):
             s = Sentence(sent)
             self.sentences.append(s)
             self.words += s.words
-            self.nouns += s.nouns
-            self.verbs += s.verbs
+            # need to merge nouns and verbs somehow
+            for n,obj in s.nouns.items():
+                if n not in self.nouns:
+                    self.nouns[n] = obj
+                    continue
+                self.nouns[n].merge(obj)
+#            self.nouns += s.nouns
+#            self.verbs += s.verbs
     def to_json(self):
         obj = super(Paragraph, self).to_json()
         obj['sentences'] = [s.to_json() for s in self.sentences]
@@ -83,8 +131,8 @@ class Body(Paragraph):
         self.paragraphs = []
         self.sentences = []
         self.words = []
-        self.nouns = []
-        self.verbs = []
+        self.nouns = {}
+        self.verbs = {}
         self.active_words = []
         self.passive_words = []
 
@@ -95,3 +143,9 @@ class Body(Paragraph):
             self.words += p.words
             self.active_words += p.active_words
             self.passive_words += p.passive_words
+
+            for n,obj in p.nouns.items():
+                if n not in self.nouns:
+                    self.nouns[n] = obj
+                    continue
+                self.nouns[n].merge(obj)
