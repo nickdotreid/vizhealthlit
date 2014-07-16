@@ -65,7 +65,7 @@ function draw_bars(items, settings){
 					&& (!settings['words_threshold_max'] || settings['words_threshold_max'] == "" || settings['words_threshold_max'] >= d.words.length)
 					) score += 1;
 			}
-
+			console.log(score);
 			return score;
 
 		}
@@ -81,8 +81,9 @@ function draw_bars(items, settings){
 				},
 				y:function(d){
 					if(!display_paragraphs){
-						y = 0-this.getBBox().height/2;
-						y += this.getBBox().height/4 * scoreJitter(d);
+						var height = Math.abs(this.getBoundingClientRect().top - this.getBoundingClientRect().bottom);
+						var y = 0-height/2;
+						y += height * scoreJitter(d);
 						return y;
 					}  
 					var y = ypos;

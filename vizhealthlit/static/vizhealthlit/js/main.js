@@ -71,6 +71,13 @@ $(document).ready(function(){
 
 function draw(items, settings){
 	$("#chart").html("");
+	var p = $("#chart").parent();
+	$("#chart").css({
+		'position':'fixed',
+		'top':p.position().top,
+		'left':p.position().left,
+		'width':p.width(),
+	});
 	$("#chart").height($(window).height()-$(".navbar").height());
 	if(visualization_functions[settings['style']]){
 		visualization_functions[settings['style']](items,settings);
