@@ -14,7 +14,7 @@ function draw_bars(items, settings){
 	.domain([
 		d3.min(sentences,function(d){ return d.score; }),
 		d3.max(sentences,function(d){ return d.score; })
-	]).range(['#004636','#779492']);
+	]).range(['#3c783e','#00ea13']);
 
 	var chart = $("#chart");
 	var svg = d3.select("#chart").append("svg:svg")
