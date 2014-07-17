@@ -1,3 +1,9 @@
+######## NOTES #########
+# This document makes use of part-of-speech tags from the Penn Treebank Project
+# I have documented what I am looking for in the code, but if you want a more complete list vists this website
+# https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+########################
+
 from django.db import models
 
 import nltk
@@ -16,11 +22,22 @@ class Noun():
 
         self.verbs = []
         self.modifiers = []
+        self.subjects = []
+
+        self.synsets = wordnet.synsets(word)
         
         self.defined = False
 
     def score(self):
         return 1
+
+    def analyze(self,tags):
+        for w,t in tags:
+            if t[0] == 'V':
+                self.verbs.append(w)
+            if t in ['PRP']:
+                self.subjects.append(w)
+        return True
 
     def merge(self, noun):
         self.count += noun.count
@@ -60,23 +77,38 @@ class Sentence(models.Model):
         tags = nltk.pos_tag(self.words)
 
         for w,t in tags:
-            if 'NN' in t:
+            if 'NN' in t: # is a noun of any type
                 if w not in self.nouns:
                     self.nouns[w] = Noun(w,t)
                 self.nouns[w].count += 1
-            if 'V' in t:
+            if 'V' in t: # is a verb of any type
                 if w not in self.verbs:
                     self.verbs[w] = {
                         'count': 0,
                     }
                 self.verbs[w]['count'] += 1
-            if t in ['PRP','VBG']:
+            if t in [
+#                'PRP', # Personal Pronoun
+                'VBG', # Verb, present partiviple
+                'VBP', # Verb, non-3rd person singular present
+                ]:
                 self.active_words.append(w)
-            if t in ['VBD']:
+            if t in [
+                'VBD', # Verb past tense
+                'VBZ', # Verb 3rd person
+                'VBN', # Verb past participle
+                ]:
                 self.passive_words.append(w)
+            if t in ['PRP']:
+                self.direct_words.append(w)
+            if t in [
+                'MD',
+                ]:
+                self.indirect_words.append(w)
 
-        # check positivity
-        # check active voice
+
+        for n in self.nouns:
+            self.nouns[n].analyze(tags)
 
     def to_json(self):
         return {
@@ -104,18 +136,28 @@ class Paragraph(Sentence):
         self.passive_words = []
 
         self.sentences = []
-        for sent in sent_detector.tokenize(self.text.strip()):
-            s = Sentence(sent)
-            self.sentences.append(s)
-            self.words += s.words
-            # need to merge nouns and verbs somehow
-            for n,obj in s.nouns.items():
-                if n not in self.nouns:
-                    self.nouns[n] = obj
-                    continue
+        for ss in self.text.strip().split("\n"):
+            for sent in sent_detector.tokenize(ss):
+                s = Sentence(sent)
+                self.sentences.append(s)
+                self.merge(s)
+
+    def merge(self, s):
+        self.words += s.words
+        self.active_words += s.active_words
+        self.passive_words += s.passive_words
+        
+        # merge nouns
+        for n,obj in s.nouns.items():
+            if n in self.nouns:
                 self.nouns[n].merge(obj)
-#            self.nouns += s.nouns
-#            self.verbs += s.verbs
+                continue
+            syn_matches = [sn for sn,sobj in self.nouns.items() for ss in sobj.synsets for s in obj.synsets if s == ss]
+            if len(syn_matches) >= 1:
+                self.nouns[syn_matches[0]].merge(obj)
+                continue
+            self.nouns[n] = obj
+
     def to_json(self):
         obj = super(Paragraph, self).to_json()
         obj['sentences'] = [s.to_json() for s in self.sentences]
@@ -136,16 +178,10 @@ class Body(Paragraph):
         self.active_words = []
         self.passive_words = []
 
-        for para in self.text.split('\n\r'):
+        for para in self.text.split('\n\n'):
             p = Paragraph(para)
             self.paragraphs.append(p)
             self.sentences += p.sentences
             self.words += p.words
-            self.active_words += p.active_words
-            self.passive_words += p.passive_words
 
-            for n,obj in p.nouns.items():
-                if n not in self.nouns:
-                    self.nouns[n] = obj
-                    continue
-                self.nouns[n].merge(obj)
+            self.merge(p)
