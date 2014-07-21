@@ -178,7 +178,7 @@ class Body(Paragraph):
         self.active_words = []
         self.passive_words = []
 
-        for para in self.text.split('\n\n'):
+        for para in self.text.split('\n\r'):
             p = Paragraph(para)
             self.paragraphs.append(p)
             self.sentences += p.sentences

@@ -36,6 +36,7 @@ class TextForm(forms.Form):
         choices=(
         ('bars','Bar Chart'),
         ('tree','Tree Map'),
+        ('pizza','Pizza Chart'),
         ))
 
 class SettingsForm(TextForm):
