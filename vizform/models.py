@@ -6,6 +6,8 @@
 
 from django.db import models
 
+import re
+
 import nltk
 import nltk.data
 from nltk.corpus import wordnet
@@ -136,7 +138,9 @@ class Paragraph(Sentence):
         self.passive_words = []
 
         self.sentences = []
-        for ss in self.text.strip().split("\n"):
+        for ss in re.split('\n|\r',self.text):
+            if ss == "":
+                continue
             for sent in sent_detector.tokenize(ss):
                 s = Sentence(sent)
                 self.sentences.append(s)
@@ -178,7 +182,9 @@ class Body(Paragraph):
         self.active_words = []
         self.passive_words = []
 
-        for para in self.text.split('\n\r'):
+        for para in re.split('\n\n|\n\r', self.text):
+            if para == "":
+                continue
             p = Paragraph(para)
             self.paragraphs.append(p)
             self.sentences += p.sentences
