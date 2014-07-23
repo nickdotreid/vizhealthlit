@@ -37,7 +37,44 @@ function draw_pizza(items, settings){
 		return 1-s;
 	}
 
-	var dPos = 0;
+	var lPos = 0;
+	var rPos = 0;
+	var goingRight = true;
+	function arcPosition(radians){
+		var start = 0;
+		var end = 0;
+
+		if(lPos == rPos){
+			lPos = 0-(radians/2);
+			rPos = 0+(radians/2);
+			start = lPos;
+			end = rPos;
+		}else if(goingRight){
+			goingRight = false;
+			start = rPos;
+			rPos += radians;
+			end = rPos;
+		}else{
+			goingRight = true;
+			start = lPos;
+			lPos -= radians;
+			end = lPos;
+		}
+
+		return {
+			'start':start,
+			'end':end,
+		}
+	}
+
+	items.sort(function(a,b){
+		if(a.score < b.score){
+			return -1;
+		}else if(a.score > b.score){
+			return 1;
+		}
+		return 0;
+	}).reverse();
 
 	var container = svg.append("g");
 	container.attr("transform","translate("+(chart.width()/2)+","+(chart.height()/2)+")");
@@ -53,9 +90,9 @@ function draw_pizza(items, settings){
 		var paragraphVal = d.words.length;
 		var currentVal = 0;
 
-		var start = degree(dPos);
-		dPos += d.words.length;
-		var end = degree(dPos);
+		var arcPos = arcPosition(degree(d.words.length));
+		var start = arcPos['start'];
+		var end = arcPos['end'];
 
 		var arc = d3.svg.arc()
 		.innerRadius(function(){
