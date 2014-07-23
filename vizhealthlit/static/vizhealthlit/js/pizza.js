@@ -68,9 +68,9 @@ function draw_pizza(items, settings){
 	}
 
 	items.sort(function(a,b){
-		if(a.score < b.score){
+		if(a.similarity < b.similarity){
 			return -1;
-		}else if(a.score > b.score){
+		}else if(a.similarity > b.similarity){
 			return 1;
 		}
 		return 0;

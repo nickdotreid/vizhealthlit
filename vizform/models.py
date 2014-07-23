@@ -65,6 +65,7 @@ class Sentence(models.Model):
         self.words = []
         self.nouns = {}
         self.verbs = {}
+        self.similarity = -1
 
         self.active_words = []
         self.passive_words = []
@@ -117,6 +118,7 @@ class Sentence(models.Model):
             'length':len(self.words),
             'words':self.words,
             'text':self.text,
+            'similarity':self.similarity,
             'score':len(self.active_words) - len(self.passive_words)
         }
 
@@ -133,6 +135,7 @@ class Paragraph(Sentence):
         self.words = []
         self.nouns = {}
         self.verbs = {}
+        self.similarity = -1
 
         self.active_words = []
         self.passive_words = []
@@ -145,6 +148,13 @@ class Paragraph(Sentence):
                 s = Sentence(sent)
                 self.sentences.append(s)
                 self.merge(s)
+
+        for s in self.sentences:
+            s.similarity = 0
+            for n in s.nouns:
+                if n in self.nouns:
+                    s.similarity += self.nouns[n].count
+
 
     def merge(self, s):
         self.words += s.words
@@ -191,3 +201,9 @@ class Body(Paragraph):
             self.words += p.words
 
             self.merge(p)
+
+        for s in self.paragraphs:
+            s.similarity = 0
+            for n in s.nouns:
+                if n in self.nouns:
+                    s.similarity += self.nouns[n].count
