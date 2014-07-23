@@ -15,6 +15,7 @@ from nltk.corpus import stopwords
 from nltk.corpus import cmudict
 
 sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+negative_words = open('vizform/negative-words.txt','r').read().split('\n')
 
 class Noun():
     def __init__(self, word, tag=False):
@@ -91,7 +92,7 @@ class Sentence(models.Model):
                     }
                 self.verbs[w]['count'] += 1
             if t in [
-#                'PRP', # Personal Pronoun
+                'PRP', # Personal Pronoun
                 'VBG', # Verb, present partiviple
                 'VBP', # Verb, non-3rd person singular present
                 ]:
@@ -108,6 +109,8 @@ class Sentence(models.Model):
                 'MD',
                 ]:
                 self.indirect_words.append(w)
+            if unicode(w).lower() in negative_words:
+                self.negative_words.append(w)
 
 
         for n in self.nouns:
@@ -119,7 +122,7 @@ class Sentence(models.Model):
             'words':self.words,
             'text':self.text,
             'similarity':self.similarity,
-            'score':len(self.active_words) - len(self.passive_words)
+            'score':len(self.active_words) - len(self.passive_words) - len(self.negative_words)
         }
 
     def __unicode__(self):
@@ -139,6 +142,8 @@ class Paragraph(Sentence):
 
         self.active_words = []
         self.passive_words = []
+
+        self.negative_words = []
 
         self.sentences = []
         for ss in re.split('\n|\r',self.text):
@@ -160,7 +165,7 @@ class Paragraph(Sentence):
         self.words += s.words
         self.active_words += s.active_words
         self.passive_words += s.passive_words
-        
+        self.negative_words += s.negative_words
         # merge nouns
         for n,obj in s.nouns.items():
             if n in self.nouns:
@@ -191,6 +196,7 @@ class Body(Paragraph):
         self.verbs = {}
         self.active_words = []
         self.passive_words = []
+        self.negative_words = []
 
         for para in re.split('\n\n|\n\r', self.text):
             if para == "":

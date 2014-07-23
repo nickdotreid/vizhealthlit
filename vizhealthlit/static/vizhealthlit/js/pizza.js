@@ -29,10 +29,10 @@ function draw_pizza(items, settings){
 
 
 	var highestScore = d3.max(items, function(d){
-		return d.score;
+		return d.similarity;
 	});
 	function scoreJitter(d){
-		var s = d.score/highestScore;
+		var s = d.similarity/highestScore;
 		if(s > 0.8) return 0;
 		return 1-s;
 	}
