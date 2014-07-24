@@ -79,9 +79,15 @@ function draw(items, settings){
 		'width':p.width(),
 	});
 	$("#chart").height($(window).height()-$(".navbar").height());
+	items = generate_scores(items,settings);
 	if(visualization_functions[settings['style']]){
 		visualization_functions[settings['style']](items,settings);
 	}else{
 		alert("no draw funciton");
 	}
+}
+
+function generate_scores(items, settings){
+	// create scores and add thresholds to items
+	return items;
 }

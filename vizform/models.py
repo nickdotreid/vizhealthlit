@@ -15,7 +15,7 @@ from nltk.corpus import stopwords
 from nltk.corpus import cmudict
 
 sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-negative_words = open('vizform/negative-words.txt','r').read().split('\n')
+negative_words = [unicode(x).lower() for x in open('vizform/negative-words.txt','r').read().split('\n')]
 
 class Noun():
     def __init__(self, word, tag=False):
