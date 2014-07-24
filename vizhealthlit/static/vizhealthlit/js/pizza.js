@@ -85,6 +85,12 @@ function draw_pizza(items, settings){
 
 		var r = chart.height()/4;
 
+		$(this).hover(function(){
+			showTooltip(d);
+		},function(){
+//			hideTooltip(d);
+		});
+
 		var rPos = 0;
 		var paragraphFraction = d.words.length/totalLength;
 		var paragraphArea = Math.PI * r * r * paragraphFraction;

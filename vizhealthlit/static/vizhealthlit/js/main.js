@@ -143,3 +143,14 @@ function generate_scores(items, settings){
 
 	return items;
 }
+
+function showTooltip(d){
+	var div = $('#tooltip');
+
+	div.html(d.text);
+
+	div.show();
+}
+function hideTooltip(d){
+	$('#tooltip').hide();
+}
