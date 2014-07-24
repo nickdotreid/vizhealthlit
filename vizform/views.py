@@ -47,20 +47,30 @@ class SettingsForm(TextForm):
             'text',
             'style',
             Div(
+                Div('sentences_threshold_min', css_class="col-md-6"),
+                Div('sentences_threshold_max', css_class="col-md-6"),
+                css_class="row"
+                ),
+            Div(
                 Div('words_threshold_min', css_class="col-md-6"),
                 Div('words_threshold_max', css_class="col-md-6"),
                 css_class="row"
                 ),
             'sentences_threshold',
             'negativity_threshold',
+            'correct_percent',
             Submit('submit', 'Submit'),
             )
 
     words_threshold_min = forms.CharField(required=False, label="Min", initial=8)
     words_threshold_max = forms.CharField(required=False, label="Max", initial=10)
 
-    sentences_threshold = forms.CharField(required=False, label="Sentences", initial=5)
+    sentences_threshold_min = forms.CharField(required=False, label="S Min", initial=3)
+    sentences_threshold_max = forms.CharField(required=False, label="S Max", initial=5)
+    
     negativity_threshold = forms.CharField(required=False, label="Negativity", initial=1)
+
+    correct_percent = forms.CharField(required=False, label="Percentile Max", initial=1)
 
 def index(request):
     return render_to_response('index.html',{

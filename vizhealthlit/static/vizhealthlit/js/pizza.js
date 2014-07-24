@@ -29,11 +29,12 @@ function draw_pizza(items, settings){
 
 
 	var highestScore = d3.max(items, function(d){
-		return d.similarity;
+		return d.score;
 	});
 	function scoreJitter(d){
-		var s = d.similarity/highestScore;
-		if(s > 0.8) return 0;
+		return 0;
+		var s = d.score/highestScore;
+//		if(s > 0.8) return 0;
 		return 1-s;
 	}
 
@@ -68,9 +69,9 @@ function draw_pizza(items, settings){
 	}
 
 	items.sort(function(a,b){
-		if(a.similarity < b.similarity){
+		if(a.score < b.score){
 			return -1;
-		}else if(a.similarity > b.similarity){
+		}else if(a.score > b.score){
 			return 1;
 		}
 		return 0;

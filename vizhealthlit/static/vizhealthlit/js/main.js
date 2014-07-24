@@ -87,7 +87,59 @@ function draw(items, settings){
 	}
 }
 
+function extract_sentences(items){
+	var sentences = []
+	items.forEach(function(d){
+		d.sentences.forEach(function(s){
+			s.paragraph = d;
+			sentences.push(s);
+		});
+	});
+	return sentences;
+}
+
 function generate_scores(items, settings){
-	// create scores and add thresholds to items
+	var sentences = extract_sentences(items);
+
+	if(!settings['sentences_threshold_min']) settings['sentences_threshold_min'] = d3.min(items,function(d){ return d.sentences.length; });
+	if(!settings['sentences_threshold_max']) settings['sentences_threshold_max'] = d3.max(items,function(d){ return d.sentences.length; });
+
+	if(!settings['words_threshold_min']) settings['words_threshold_min'] = d3.min(sentences,function(d){ return d.words.length; });
+	if(!settings['words_threshold_max']) settings['words_threshold_max'] = d3.max(sentences,function(d){ return d.words.length; });
+
+	
+	function score(d, type){
+		d.score = 1;
+
+		var length_max = settings[type+'_threshold_max']
+		var length_min = settings[type+'_threshold_min']
+
+		var length = d.words.length;
+		if(d.sentences) length = d.sentences.length;
+		
+		if(length < length_min){
+			d.score -= length - length_min;
+		}
+		if(length > length_max){
+			d.score -= length_max - length;
+		}
+
+		d.score += d.active_words - d.passive_words;
+	}
+	items.forEach(function(d){
+		score(d,'sentences')
+		d.sentences.forEach(function(s){
+			score(s,'words');
+		});
+	});
+
+	var items_max = d3.max(items, function(d){ return d.score; }) * settings['correct_percent'];
+	var sentences_max = d3.max(items, function(d){ return d.score; }) * settings['correct_percent'];
+
+	items.forEach(function(d){
+		if(d.score > items_max) d.score = items_max;
+		d.sentences.forEach(function(s){ if(s.score > sentences_max) s.score = sentences_max; });
+	});
+
 	return items;
 }
