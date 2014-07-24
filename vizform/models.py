@@ -15,12 +15,11 @@ from nltk.corpus import stopwords
 from nltk.corpus import cmudict
 
 sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-negative_words = [unicode(x).lower() for x in open('vizform/negative-words.txt','r').read().split('\n')]
 
 class Noun():
     def __init__(self, word, tag=False):
         self.word = word
-        self.tag = tag
+        self.tags = [tag]
         self.count = 0
 
         self.verbs = []
@@ -46,12 +45,22 @@ class Noun():
         self.count += noun.count
         
         # This should be smarter? Maybe Count??
+        self.tags += noun.tags
         self.verbs += noun.verbs
         self.modifiers += noun.modifiers
 
         if noun.defined:
             self.defined = True
         return self
+
+    def to_json(self):
+        return {
+            'text':self.word,
+            'count':self.count,
+            'tags':self.tags,
+            'verbs':self.verbs,
+            'subjects':self.subjects,
+        }
 
     def __unicode__(self):
         return "%s (%d)" % (self.word,self.count)
@@ -60,24 +69,23 @@ class Sentence(models.Model):
     class Meta:
         abstract = True
 
+    words = []
+    nouns = {}
+    verbs = {}
+    similarity = -1
+
+    active_words = []
+    passive_words = []
+    
+    direct_words = []
+    indirect_words = []
+
+    negative_words = []
+
     def __init__(self, text):
         self.text = text
-        
-        self.words = []
-        self.nouns = {}
-        self.verbs = {}
-        self.similarity = -1
-
-        self.active_words = []
-        self.passive_words = []
-        
-        self.direct_words = []
-        self.indirect_words = []
-
-        self.negative_words = []
 
         self.words = nltk.word_tokenize(text)
-
         tags = nltk.pos_tag(self.words)
 
         for w,t in tags:
@@ -109,8 +117,6 @@ class Sentence(models.Model):
                 'MD',
                 ]:
                 self.indirect_words.append(w)
-            if unicode(w).lower() in negative_words:
-                self.negative_words.append(w)
 
 
         for n in self.nouns:
@@ -122,7 +128,11 @@ class Sentence(models.Model):
             'words':self.words,
             'text':self.text,
             'similarity':self.similarity,
-            'score':len(self.active_words) - len(self.passive_words) - len(self.negative_words)
+            'active_words':len(self.active_words),
+            'passive_words':len(self.passive_words),
+            'negative_words':len(self.negative_words),
+            'direct_words':len(self.direct_words),
+            'indirect_words':len(self.indirect_words),
         }
 
     def __unicode__(self):
