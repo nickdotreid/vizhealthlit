@@ -69,21 +69,23 @@ class Sentence(models.Model):
     class Meta:
         abstract = True
 
-    words = []
-    nouns = {}
-    verbs = {}
-    similarity = -1
+    def setup(self):
+        self.words = []
+        self.nouns = {}
+        self.verbs = {}
+        self.similarity = -1
 
-    active_words = []
-    passive_words = []
-    
-    direct_words = []
-    indirect_words = []
+        self.active_words = []
+        self.passive_words = []
+        
+        self.direct_words = []
+        self.indirect_words = []
 
-    negative_words = []
+        self.negative_words = []
 
     def __init__(self, text):
         self.text = text
+        self.setup()
 
         self.words = nltk.word_tokenize(text)
         tags = nltk.pos_tag(self.words)
@@ -140,22 +142,11 @@ class Sentence(models.Model):
 
 class Paragraph(Sentence):
 
-    sentences = []
-
     def __init__(self, text):
         self.text = text
-        
-        self.words = []
-        self.nouns = {}
-        self.verbs = {}
-        self.similarity = -1
-
-        self.active_words = []
-        self.passive_words = []
-
-        self.negative_words = []
-
+        self.setup()
         self.sentences = []
+
         for ss in re.split('\n|\r',self.text):
             if ss == "":
                 continue
@@ -194,19 +185,11 @@ class Paragraph(Sentence):
 
 class Body(Paragraph):
 
-    paragraphs = []
-
     def __init__(self, text):
         self.text = text
-        
+        self.setup()
         self.paragraphs = []
         self.sentences = []
-        self.words = []
-        self.nouns = {}
-        self.verbs = {}
-        self.active_words = []
-        self.passive_words = []
-        self.negative_words = []
 
         for para in re.split('\n\n|\n\r', self.text):
             if para == "":
