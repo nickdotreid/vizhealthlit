@@ -7,9 +7,11 @@
 from django.db import models
 
 import re
+import os
+from vizhealthlit.settings import BASE_DIR
 
 import nltk
-nltk.data.path.append("../nltk_data")
+nltk.data.path.append(os.path.join(BASE_DIR, "nltk_data"))
 
 import nltk.data
 from nltk.corpus import wordnet
