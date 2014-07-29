@@ -9,6 +9,8 @@ from django.db import models
 import re
 
 import nltk
+nltk.data.path.append("../nltk_data")
+
 import nltk.data
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
