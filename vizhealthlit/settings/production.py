@@ -20,6 +20,9 @@ SITE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BASE_DIR = os.path.abspath(os.path.join(SITE_ROOT, ".."))
 
 
+import nltk
+nltk.data.path.append(os.path.join(BASE_DIR, "nltk_data"))
+
 # Heroku platform settings.
 
 HEROKU_APP_NAME = "vizhealthlit"
