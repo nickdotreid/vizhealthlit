@@ -66,7 +66,11 @@ $(document).ready(function(){
 		if(form.data('items')){
 			draw(form.data('items'),form.serializeObject());
 		}
+	}).delegate('#tooltip .close','click',function(event){
+		event.preventDefault();
+		hideTooltip();
 	});
+	$("#tooltip").hide();
 });
 
 function draw(items, settings){
@@ -118,19 +122,21 @@ function generate_scores(items, settings){
 		if(d.sentences) length = d.sentences.length;
 		
 		if(length < length_min){
-			d.score -= length - length_min;
+			d.score += length - length_min;
 		}
 		if(length > length_max){
-			d.score -= length_max - length;
+			d.score += length_max - length;
 		}
+
+		if(d.sentences) d.sentences.forEach(function(s){ d.score += s.score; });
 
 		d.score += d.active_words - d.passive_words;
 	}
 	items.forEach(function(d){
-		score(d,'sentences')
 		d.sentences.forEach(function(s){
 			score(s,'words');
 		});
+		score(d,'sentences');
 	});
 
 	var items_max = d3.max(items, function(d){ return d.score; }) * settings['correct_percent'];
@@ -145,12 +151,31 @@ function generate_scores(items, settings){
 }
 
 function showTooltip(d){
+	$('.form-container').hide();
 	var div = $('#tooltip');
 
-	div.html(d.text);
+	$(".score .value").data("value",d.score).html(d.score);
+	$(".words",div).data("text",d.text).html(d.text);
 
 	div.show();
 }
 function hideTooltip(d){
 	$('#tooltip').hide();
+	$('.form-container').show();
+}
+
+function hoverSentence(d){
+	$("#tooltip .score .value").html(d.score);
+
+	var words = $('#tooltip .words').html();
+	var parts = words.split(d.text);
+	if(parts.length == 2) $('#tooltip .words').html(parts[0]+"<strong>"+d.text+"</strong>"+parts[1]);
+}
+function clearSentence(d){
+	$("#tooltip .value").each(function(item){
+		$(this).html($(this).data("value"));
+	});
+
+	var words = $('#tooltip .words');
+	words.html(words.data("text"));
 }

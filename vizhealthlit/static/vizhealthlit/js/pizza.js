@@ -126,6 +126,20 @@ function draw_pizza(items, settings){
 		.append("path").attr("d",arc)
 		.style("fill",function(d){
 			return color(d.score);
+		}).each(function(d){
+			var timeout = false;
+			$(this).hover(function(){
+				timeout = setTimeout(function(){
+					timeout = false;
+					hoverSentence(d);
+				},150);
+			}, function(){
+				if(timeout){
+					clearTimeout(timeout);
+				}else{
+					clearSentence(d);
+				}
+			});
 		});
 	});
 
