@@ -144,6 +144,10 @@ function draw_pizza(items, settings){
 	});
 
 	var sentences = paragraphs.selectAll("path");
+
+	return function blit(settings){
+
+	}
 }
 
 

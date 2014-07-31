@@ -41,11 +41,16 @@ $(document).ready(function(){
 	});
 });
 
+var graph = false;
+
 $(document).ready(function(){
 	$(window).resize();
 	$('body').delegate('form','submit',function(event){
 		event.preventDefault();
 		var form = $(this);
+
+		$('input, select',form).unbind("change");
+
 		$.ajax({
 			url: form.attr("action"),
 			type: form.attr("method"),
@@ -56,12 +61,13 @@ $(document).ready(function(){
 					form.remove();
 				}
 				if(data['items']){
-					form.data('items',data['items']);
-					draw(data['items'],form.serializeObject());
-				}
-				if(data['nouns']){
-					form.data('nouns',data['nouns']);
-					showNouns(data['nouns']);
+					graph = new Graph();
+					graph.draw(data['items'],form.serializeObject());
+
+					$("input, select",form).bind("change",function(){
+						graph.update(form.serializeObject());
+					});
+					if(data['nouns']) graph.setNouns(data['nouns']);
 				}
 			},
 		});
@@ -75,30 +81,14 @@ $(document).ready(function(){
 		hideTooltip();
 	});
 	$("#tooltip").hide();
-
-	$("#nouns").delegate(".noun",'click',function(event){
-		event.preventDefault();
-
-	})
 });
 
-function showNouns(items){
-	items.sort(function(a,b){
-		if(a.count > b.count) return -1;
-		if(b.count > a.count) return 1;
-		if(a.text > b.text) return -1;
-		return 1;
-	});
-	var i = 0
-	while(i < 5 && i<items.length){
-		i++;
-		var item = items[i];
-		var noun = $('<a href="#" class="noun">'+item.text+'</a>').appendTo("#nouns");
-		noun.data("data",item);
-	}
-}
 
-function draw(items, settings){
+function Graph(){
+
+}
+Graph.prototype.draw = function(items, settings){
+	var graph = this;
 	$("#chart").html("");
 	var p = $("#chart").parent();
 	$("#chart").css({
@@ -110,10 +100,36 @@ function draw(items, settings){
 	$("#chart").height($(window).height()-$(".navbar").height());
 	items = generate_scores(items,settings);
 	if(visualization_functions[settings['style']]){
-		visualization_functions[settings['style']](items,settings);
+		graph.update = visualization_functions[settings['style']](items,settings);
 	}else{
 		alert("no draw funciton");
 	}
+}
+Graph.prototype.update = function(settings){
+	alert("No Update Function");
+}
+Graph.prototype.setNouns = function(nouns){
+	var graph = this;
+	graph.nouns = nouns;
+	nouns.sort(function(a,b){
+		if(a.count > b.count) return -1;
+		if(b.count > a.count) return 1;
+		if(a.text > b.text) return -1;
+		return 1;
+	});
+	$("#nouns").html("");
+	nouns.forEach(function(d){
+		var noun = d;
+		var div = $('<li class="noun" ><a href="#">'+noun.text+'</a></li>').appendTo("#nouns");
+		div.bind('click',function(event){
+			event.preventDefault();
+			div.toggleClass("active");
+			graph.update();
+		}).bind('mouseenter mouseleave',function(event){
+			div.toggleClass("over");
+			graph.update();
+		});
+	});
 }
 
 function extract_sentences(items){
