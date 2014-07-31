@@ -92,10 +92,10 @@ def result(request):
             content_type="application/json"
             )
         body = Body(form.cleaned_data['text'])
-        items = body.paragraphs
         return HttpResponse(
             json.dumps({
-                'items':[item.to_json() for item in items],
+                'items':[item.to_json() for item in body.paragraphs],
+                'nouns':[noun.to_json() for key,noun in body.nouns.items()],
                 }),
             content_type="application/json"
             )
