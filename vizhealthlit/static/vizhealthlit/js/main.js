@@ -59,6 +59,10 @@ $(document).ready(function(){
 					form.data('items',data['items']);
 					draw(data['items'],form.serializeObject());
 				}
+				if(data['nouns']){
+					form.data('nouns',data['nouns']);
+					showNouns(data['nouns']);
+				}
 			},
 		});
 	}).delegate('form input,form select','change',function(){
@@ -71,7 +75,28 @@ $(document).ready(function(){
 		hideTooltip();
 	});
 	$("#tooltip").hide();
+
+	$("#nouns").delegate(".noun",'click',function(event){
+		event.preventDefault();
+
+	})
 });
+
+function showNouns(items){
+	items.sort(function(a,b){
+		if(a.count > b.count) return -1;
+		if(b.count > a.count) return 1;
+		if(a.text > b.text) return -1;
+		return 1;
+	});
+	var i = 0
+	while(i < 5 && i<items.length){
+		i++;
+		var item = items[i];
+		var noun = $('<a href="#" class="noun">'+item.text+'</a>').appendTo("#nouns");
+		noun.data("data",item);
+	}
+}
 
 function draw(items, settings){
 	$("#chart").html("");

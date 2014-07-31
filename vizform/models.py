@@ -22,7 +22,9 @@ sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 
 class Noun():
     def __init__(self, word, tag=False):
-        self.word = word
+        self.text = word
+        self.words = [word]
+
         self.tags = [tag]
         self.count = 0
 
@@ -48,6 +50,7 @@ class Noun():
     def merge(self, noun):
         self.count += noun.count
         
+        self.words += noun.words
         # This should be smarter? Maybe Count??
         self.tags += noun.tags
         self.verbs += noun.verbs
@@ -59,7 +62,8 @@ class Noun():
 
     def to_json(self):
         return {
-            'text':self.word,
+            'text':self.words[0],
+            'words':self.words,
             'count':self.count,
             'tags':self.tags,
             'verbs':self.verbs,
