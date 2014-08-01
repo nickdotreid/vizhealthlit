@@ -89,6 +89,7 @@ function Graph(){
 }
 Graph.prototype.draw = function(items, settings){
 	var graph = this;
+	graph.items = items;
 	$("#chart").html("");
 	var p = $("#chart").parent();
 	$("#chart").css({
@@ -100,13 +101,18 @@ Graph.prototype.draw = function(items, settings){
 	$("#chart").height($(window).height()-$(".navbar").height());
 	items = generate_scores(items,settings);
 	if(visualization_functions[settings['style']]){
-		graph.update = visualization_functions[settings['style']](items,settings);
+		graph.blit = visualization_functions[settings['style']](items,settings);
 	}else{
 		alert("no draw funciton");
 	}
 }
 Graph.prototype.update = function(settings){
-	alert("No Update Function");
+	var items = generate_scores(this.items,settings);
+	if(this.blit){
+		this.blit(items,settings);
+	}else{
+		alert("no update functions");
+	}
 }
 Graph.prototype.setNouns = function(nouns){
 	var graph = this;
@@ -124,10 +130,18 @@ Graph.prototype.setNouns = function(nouns){
 		div.bind('click',function(event){
 			event.preventDefault();
 			div.toggleClass("active");
-			graph.update();
-		}).bind('mouseenter mouseleave',function(event){
+			var settings = $("form").serializeObject();
+			settings['words'] = noun.words;
+			graph.update(settings);
+		}).bind('mouseenter',function(event){
 			div.toggleClass("over");
-			graph.update();
+			var settings = $("form").serializeObject();
+			settings['words'] = noun.words;
+			graph.update(settings);
+		}).bind('mouseleave',function(event){
+			div.toggleClass("over");
+			var settings = $("form").serializeObject();
+			graph.update(settings);
 		});
 	});
 }
@@ -173,11 +187,22 @@ function generate_scores(items, settings){
 
 		d.score += d.active_words - d.passive_words;
 	}
+
+	function wordScore(d){
+		d.wordScore = 0;
+		if(!settings.words) return;
+		d.words.forEach(function(w){
+			if(settings.words.indexOf(w) >= 0) d.wordScore++;
+		});
+	}
+
 	items.forEach(function(d){
 		d.sentences.forEach(function(s){
 			score(s,'words');
+			wordScore(s);
 		});
 		score(d,'sentences');
+		wordScore(d);
 	});
 
 	var items_max = d3.max(items, function(d){ return d.score; }) * settings['correct_percent'];

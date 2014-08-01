@@ -120,9 +120,7 @@ function draw_pizza(items, settings){
 			var xpos = Math.sin(angle) * distance;
 			var ypos = Math.cos(angle) * distance * -1;
 			return "translate("+xpos+","+ypos+")";
-		}).selectAll("path").data(function(){
-			return d.sentences;
-		}).enter()
+		}).selectAll("path").data(d.sentences).enter()
 		.append("path").attr("d",arc)
 		.style("fill",function(d){
 			return color(d.score);
@@ -143,10 +141,48 @@ function draw_pizza(items, settings){
 		});
 	});
 
-	var sentences = paragraphs.selectAll("path");
+	var sentenceElements = paragraphs.selectAll("path");
+	var originalColor = color;
+	return function blit(items, settings){
+		// update data
+		var sentences = []
+		items.forEach(function(d){
+			d.sentences.forEach(function(s){
+				s.paragraph = d;
+				sentences.push(s);
+			});
+		});
+		paragraphs.selectAll("g.wedge").data(items).each(function(d){
+			d3.select(this).selectAll("path").data(d.sentences);
+		});
 
-	return function blit(settings){
-
+		// create new color scale
+		if(settings['words']){
+			var brightness = d3.scale.linear()
+			.domain([
+				d3.min(sentences,function(d){ 
+					return d.score;
+				}),
+				d3.max(sentences,function(d){ return d.score; })
+			]).range([20,80]);
+			var saturation = d3.scale.linear()
+			.domain([
+				d3.min(sentences,function(d){ return d.wordScore; }),
+				d3.max(sentences,function(d){ return d.wordScore; })
+			]).range([0,100]);
+			color = function(d){
+				var cstr = "hsl(21,"+saturation(d.wordScore)+"%,"+brightness(d.score)+"%)";
+				return d3.hsl(cstr).toString();
+			}
+		}else{
+			color = function(d){
+				return originalColor(d.score);
+			}
+		}
+		// update elements
+		sentenceElements.style("fill",function(d){
+			return color(d);
+		});
 	}
 }
 
