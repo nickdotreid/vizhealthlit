@@ -44,21 +44,27 @@ class SettingsForm(TextForm):
         super(SettingsForm, self).__init__(*args, **kwargs)
 
         self.helper.layout = Layout(
-            'text',
-            'style',
             Div(
-                Div('sentences_threshold_min', css_class="col-md-6"),
-                Div('sentences_threshold_max', css_class="col-md-6"),
-                css_class="row"
-                ),
-            Div(
-                Div('words_threshold_min', css_class="col-md-6"),
-                Div('words_threshold_max', css_class="col-md-6"),
-                css_class="row"
-                ),
-            'sentences_threshold',
-            'negativity_threshold',
-            'correct_percent',
+                Div(
+                    'text',
+                    'style',
+                    css_class="col-md-6"),
+                Div(
+                    Div(
+                        Div('sentences_threshold_min', css_class="col-md-6"),
+                        Div('sentences_threshold_max', css_class="col-md-6"),
+                        css_class="row"
+                        ),
+                    Div(
+                        Div('words_threshold_min', css_class="col-md-6"),
+                        Div('words_threshold_max', css_class="col-md-6"),
+                        css_class="row"
+                    ),
+                    'sentences_threshold',
+                    'negativity_threshold',
+                    'correct_percent',
+                    css_class="col-md-6"),
+                css_class="row"),
             Submit('submit', 'Submit'),
             )
 

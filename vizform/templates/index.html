@@ -3,20 +3,20 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="row">
+<div id="settings-pane" class="pane">
+{% crispy form %}
+</div>
+<div id="viz-pane" class="pane row">
 	<div class="col-sm-4">
-		<div class="form-container">
-		{% crispy form %}
-		</div>
-		<div id="tooltip">
-			<a href="#" class="close">Close</a>
-			<ul id="nouns" class="nav nav-pills nav-stacked"></ul>
-			<div class="score">Score: <span class="value"></span></div>
-			<div class="words"></div>
-		</div>
+		<a href="#" class="close">Close</a>
+		<div class="score">Score: <span class="value"></span></div>
+		<div class="words"></div>
 	</div>
-	<div class="col-sm-8">
+	<div class="col-sm-7">
 		<div id="chart"></div>
+	</div>
+	<div class="col-sm-1">
+		<ul id="nouns" class="nav nav-pills nav-stacked"></ul>
 	</div>
 </div>
 {% endblock %}

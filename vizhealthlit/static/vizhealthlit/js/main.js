@@ -49,6 +49,9 @@ $(document).ready(function(){
 		event.preventDefault();
 		var form = $(this);
 
+		$("#settings-pane").hide();
+		$("#viz-pane").show();
+
 		$('input, select',form).unbind("change");
 
 		$.ajax({
@@ -59,6 +62,8 @@ $(document).ready(function(){
 				if(data['form']){
 					form.after(data['form']);
 					form.remove();
+					$("#settings-pane").show();
+					$("#viz-pane").hide();
 				}
 				if(data['items']){
 					graph = new Graph();
@@ -76,11 +81,12 @@ $(document).ready(function(){
 		if(form.data('items')){
 			draw(form.data('items'),form.serializeObject());
 		}
-	}).delegate('#tooltip .close','click',function(event){
+	}).delegate('#viz-pane .close','click',function(event){
 		event.preventDefault();
-		hideTooltip();
+		$("#viz-pane").hide();
+		$("#settings-pane").show();
 	});
-	$("#tooltip").hide();
+	$("#viz-pane").hide();
 });
 
 
@@ -226,8 +232,7 @@ function showTooltip(d){
 	div.show();
 }
 function hideTooltip(d){
-	$('#tooltip').hide();
-	$('.form-container').show();
+
 }
 
 function hoverSentence(d){
