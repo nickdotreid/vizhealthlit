@@ -74,6 +74,9 @@ $(document).ready(function(){
 					});
 					if(data['nouns']) graph.setNouns(data['nouns']);
 				}
+				if(data['text']){
+					$("#viz-pane .words").data("text",data['text']).html(data['text']);
+				}
 			},
 		});
 	}).delegate('form input,form select','change',function(){
@@ -223,30 +226,29 @@ function generate_scores(items, settings){
 }
 
 function showTooltip(d){
-	$('.form-container').hide();
-	var div = $('#tooltip');
+	var div = $('#viz-pane');
 
 	$(".score .value").data("value",d.score).html(d.score);
-	$(".words",div).data("text",d.text).html(d.text);
-
-	div.show();
+//	$(".words",div).data("text",d.text).html(d.text);
 }
 function hideTooltip(d){
 
 }
 
 function hoverSentence(d){
-	$("#tooltip .score .value").html(d.score);
+	$("#viz-pane .score .value").html(d.score);
 
-	var words = $('#tooltip .words').html();
+	var words = $('#viz-pane .words').html();
 	var parts = words.split(d.text);
-	if(parts.length == 2) $('#tooltip .words').html(parts[0]+"<strong>"+d.text+"</strong>"+parts[1]);
+	if(parts.length == 2) $('#viz-pane .words').html(parts[0]+"<span class='highlighted'>"+d.text+"</span>"+parts[1]);
+
+	// SCROLL TO WORDS
 }
 function clearSentence(d){
-	$("#tooltip .value").each(function(item){
+	$("#viz-pane .value").each(function(item){
 		$(this).html($(this).data("value"));
 	});
 
-	var words = $('#tooltip .words');
+	var words = $('#viz-pane .words');
 	words.html(words.data("text"));
 }
