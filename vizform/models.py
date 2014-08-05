@@ -20,6 +20,8 @@ from nltk.corpus import cmudict
 
 sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 
+from readability.readability import Readability
+
 class Noun():
     def __init__(self, word, tag=False):
         self.text = word
@@ -91,6 +93,12 @@ class Sentence(models.Model):
 
         self.negative_words = []
 
+        rd = Readability(self.text)
+        self.FleschReadingEase = rd.FleschReadingEase()
+        self.FleschKincaidGradeLevel = rd.FleschKincaidGradeLevel()
+        self.GunningFogIndex = rd.GunningFogIndex()
+        self.SMOGIndex = rd.SMOGIndex()
+
     def __init__(self, text):
         self.text = text
         self.setup()
@@ -143,6 +151,10 @@ class Sentence(models.Model):
             'negative_words':len(self.negative_words),
             'direct_words':len(self.direct_words),
             'indirect_words':len(self.indirect_words),
+            'FleschReadingEase':self.FleschReadingEase,
+            'FleschKincaidGradeLevel':self.FleschKincaidGradeLevel,
+            'GunningFogIndex':self.GunningFogIndex,
+            'SMOGIndex':self.SMOGIndex,
         }
 
     def __unicode__(self):
