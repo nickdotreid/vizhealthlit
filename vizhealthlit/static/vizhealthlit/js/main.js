@@ -66,39 +66,37 @@ $(document).ready(function(){
 					$("#viz-pane").hide();
 				}
 				if(data['items']){
-					graph = new Graph();
-					graph.draw(data['items'],form.serializeObject());
-
-					$("input, select",form).bind("change",function(){
-						graph.update(form.serializeObject());
-					});
+					graph = new Graph(data['items']);
+					graph.draw();
 					if(data['nouns']) graph.setNouns(data['nouns']);
+					if(data['text']) $("#viz-pane .words").data("text",data['text']).html(data['text']);
 				}
-				if(data['text']){
-					$("#viz-pane .words").data("text",data['text']).html(data['text']);
-				}
+
 			},
 		});
-	}).delegate('form input,form select','change',function(){
-		var form = $(this).parents("form");
-		if(form.data('items')){
-			draw(form.data('items'),form.serializeObject());
-		}
-	}).delegate('#viz-pane .close','click',function(event){
-		event.preventDefault();
-		$("#viz-pane").hide();
-		$("#settings-pane").show();
 	});
 	$("#viz-pane").hide();
 });
 
 
-function Graph(){
-
-}
-Graph.prototype.draw = function(items, settings){
+function Graph(items){
 	var graph = this;
 	graph.items = items;
+
+	var form = $('form.settings-form');
+
+	graph.settings = form.serializeObject();
+
+	$("input, select",form).bind("change",function(){
+		graph.update(form.serializeObject());
+	});
+
+}
+Graph.prototype.draw = function(){
+	var graph = this;
+	var items = graph.items;
+	var settings = graph.settings;
+
 	$("#chart").html("");
 	var p = $("#chart").parent();
 	$("#chart").css({
@@ -108,14 +106,17 @@ Graph.prototype.draw = function(items, settings){
 		'width':p.width(),
 	});
 	$("#chart").height($(window).height()-$(".navbar").height());
+
 	items = generate_scores(items,settings);
 	if(visualization_functions[settings['style']]){
+		graph.layout = settings['style'];
 		graph.blit = visualization_functions[settings['style']](items,settings);
 	}else{
 		alert("no draw funciton");
 	}
 }
 Graph.prototype.update = function(settings){
+	if(this.layout != settings['style']) return this.draw();
 	var items = generate_scores(this.items,settings);
 	if(this.blit){
 		this.blit(items,settings);
@@ -132,6 +133,7 @@ Graph.prototype.setNouns = function(nouns){
 		if(a.text > b.text) return -1;
 		return 1;
 	});
+	var active_nouns = [];
 	$("#nouns").html("");
 	nouns.forEach(function(d){
 		var noun = d;
@@ -139,18 +141,24 @@ Graph.prototype.setNouns = function(nouns){
 		div.bind('click',function(event){
 			event.preventDefault();
 			div.toggleClass("active");
-			var settings = $("form").serializeObject();
-			settings['words'] = noun.words;
-			graph.update(settings);
+			if(div.hasClass("active")){
+				active_nouns = active_nouns.concat(noun.words);
+			}else{
+				noun.words.forEach(function(w){
+					var index = active_nouns.indexOf(w);
+					if(index >= 0) active_nouns = active_nouns.splice(index,1);
+				});
+			}
+			graph.settings['words'] = active_nouns;
+			graph.update(graph.settings);
 		}).bind('mouseenter',function(event){
 			div.toggleClass("over");
-			var settings = $("form").serializeObject();
-			settings['words'] = noun.words;
-			graph.update(settings);
+			graph.settings['words'] = active_nouns.concat(noun.words);
+			graph.update(graph.settings);
 		}).bind('mouseleave',function(event){
 			div.toggleClass("over");
-			var settings = $("form").serializeObject();
-			graph.update(settings);
+			graph.settings['words'] = active_nouns;
+			graph.update(graph.settings);
 		});
 	});
 }
@@ -199,7 +207,7 @@ function generate_scores(items, settings){
 
 	function wordScore(d){
 		d.wordScore = 0;
-		if(!settings.words) return;
+		if(!settings.words || settings.words.length < 1) return;
 		d.words.forEach(function(w){
 			if(settings.words.indexOf(w) >= 0) d.wordScore++;
 		});
