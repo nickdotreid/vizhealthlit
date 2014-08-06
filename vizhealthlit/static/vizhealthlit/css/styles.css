@@ -6132,3 +6132,9 @@ button.close {
 body {
   padding-top: 70px;
 }
+#viz-pane .words {
+  color: #666;
+}
+#viz-pane .words .highlighted {
+  color: #000;
+}
