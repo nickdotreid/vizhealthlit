@@ -146,7 +146,7 @@ Graph.prototype.setNouns = function(nouns){
 			}else{
 				noun.words.forEach(function(w){
 					var index = active_nouns.indexOf(w);
-					if(index >= 0) active_nouns = active_nouns.splice(index,1);
+					if(index >= 0) active_nouns.splice(index,1);
 				});
 			}
 			graph.settings['words'] = active_nouns;

@@ -157,7 +157,7 @@ function draw_pizza(items, settings){
 		});
 
 		// create new color scale
-		if(settings['words']){
+		if(settings['words'] && settings['words'].length > 0){
 			var brightness = d3.scale.linear()
 			.domain([
 				d3.min(sentences,function(d){ 
