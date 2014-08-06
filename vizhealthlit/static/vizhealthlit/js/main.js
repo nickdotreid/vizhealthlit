@@ -177,32 +177,41 @@ function extract_sentences(items){
 function generate_scores(items, settings){
 	var sentences = extract_sentences(items);
 
-	if(!settings['sentences_threshold_min']) settings['sentences_threshold_min'] = d3.min(items,function(d){ return d.sentences.length; });
-	if(!settings['sentences_threshold_max']) settings['sentences_threshold_max'] = d3.max(items,function(d){ return d.sentences.length; });
+	if(settings['formula'] == 'custom'){
+		if(!settings['sentences_threshold_min']) settings['sentences_threshold_min'] = d3.min(items,function(d){ return d.sentences.length; });
+		if(!settings['sentences_threshold_max']) settings['sentences_threshold_max'] = d3.max(items,function(d){ return d.sentences.length; });
 
-	if(!settings['words_threshold_min']) settings['words_threshold_min'] = d3.min(sentences,function(d){ return d.words.length; });
-	if(!settings['words_threshold_max']) settings['words_threshold_max'] = d3.max(sentences,function(d){ return d.words.length; });
+		if(!settings['words_threshold_min']) settings['words_threshold_min'] = d3.min(sentences,function(d){ return d.words.length; });
+		if(!settings['words_threshold_max']) settings['words_threshold_max'] = d3.max(sentences,function(d){ return d.words.length; });
 
-	
-	function score(d, type){
-		d.score = 1;
-
-		var length_max = settings[type+'_threshold_max']
-		var length_min = settings[type+'_threshold_min']
-
-		var length = d.words.length;
-		if(d.sentences) length = d.sentences.length;
 		
-		if(length < length_min){
-			d.score += length - length_min;
-		}
-		if(length > length_max){
-			d.score += length_max - length;
-		}
+		function score(d, type){
+			d.score = 1;
 
-		if(d.sentences) d.sentences.forEach(function(s){ d.score += s.score; });
+			var length_max = settings[type+'_threshold_max']
+			var length_min = settings[type+'_threshold_min']
 
-		d.score += d.active_words - d.passive_words;
+			var length = d.words.length;
+			if(d.sentences) length = d.sentences.length;
+			
+			if(length < length_min){
+				d.score += length - length_min;
+			}
+			if(length > length_max){
+				d.score += length_max - length;
+			}
+
+			if(d.sentences) d.sentences.forEach(function(s){ d.score += s.score; });
+
+			d.score += d.active_words - d.passive_words;
+		}
+	}else if(items[0][settings['formula']]){
+		function score(d, type){
+			d.score = d[settings['formula']];
+		}
+	}else{
+		alert("No reading formula");
+		return;
 	}
 
 	function wordScore(d){

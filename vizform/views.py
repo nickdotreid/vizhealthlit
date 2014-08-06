@@ -43,7 +43,7 @@ class SettingsForm(forms.Form):
         self.helper.form_class = 'form-vertical settings-form'
 
         self.helper.layout = Layout(
-            'text',
+            'formula',
             'style',
             Div(
                 Div('sentences_threshold_min', css_class="col-xs-6"),
@@ -67,6 +67,15 @@ class SettingsForm(forms.Form):
             ('tree','Tree Map'),
             ('pizza','Pizza Chart'),
             ))
+
+    formula = forms.ChoiceField(label='Pick a reading formula', required=False,
+        choices=(
+            ('FleschReadingEase','Reading Ease'),
+            ('FleschKincaidGradeLevel','Grade Level'),
+            ('GunningFogIndex','Gunning Fog'),
+            ('SMOGIndex', 'SMOG'),
+            ('custom','Custom'),
+        ))
 
     words_threshold_min = forms.CharField(required=False, label="Min", initial=8)
     words_threshold_max = forms.CharField(required=False, label="Max", initial=10)
