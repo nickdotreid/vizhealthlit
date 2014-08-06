@@ -156,34 +156,41 @@ function draw_pizza(items, settings){
 			d3.select(this).selectAll("path").data(d.sentences);
 		});
 
-		// create new color scale
-		if(settings['words'] && settings['words'].length > 0){
-			var brightness = d3.scale.linear()
-			.domain([
-				d3.min(sentences,function(d){ 
-					return d.score;
-				}),
-				d3.max(sentences,function(d){ return d.score; })
-			]).range([20,80]);
-			var saturation = d3.scale.linear()
-			.domain([
-				d3.min(sentences,function(d){ return d.wordScore; }),
-				d3.max(sentences,function(d){ return d.wordScore; })
-			]).range([0,100]);
-			color = function(d){
-				var cstr = "hsl(21,"+saturation(d.wordScore)+"%,"+brightness(d.score)+"%)";
-				return d3.hsl(cstr).toString();
-			}
-		}else{
-			color = function(d){
-				return originalColor(d.score);
-			}
-		}
+		var color = makeColors(sentences, settings);
+
 		// update elements
 		sentenceElements.style("fill",function(d){
 			return color(d);
 		});
 	}
+}
+
+function makeColors(items, settings){
+		var hue = 115;
+		var brightnessKey = 'score';
+		var saturationKey = 'score';
+
+		if(settings['words'] && settings['words'].length > 0){
+			hue = 21;
+			saturationKey = 'wordScore';
+		}
+
+		var brightness = d3.scale.linear()
+		.domain([
+			d3.min(items,function(d){ return d[brightnessKey]; }),
+			d3.max(items,function(d){ return d[brightnessKey]; })
+		]).range([20,80]);
+		
+		var saturation = d3.scale.linear()
+		.domain([
+			d3.min(items,function(d){ return d[saturationKey]; }),
+			d3.max(items,function(d){ return d[saturationKey]; })
+		]).range([0,100]);
+
+		return function(d){
+			var cstr = "hsl("+hue+","+saturation(d[saturationKey])+"%,"+brightness(d[brightnessKey])+"%)";
+			return d3.hsl(cstr).toString();
+		}
 }
 
 
