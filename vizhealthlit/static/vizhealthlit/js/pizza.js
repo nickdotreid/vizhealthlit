@@ -161,6 +161,7 @@ function draw_pizza(items, settings){
 			.enter()
 			.append("path").attr("d",arc)
 			.style("fill","#FFFFFF")
+			.attr("stroke","white").attr("stroke-width","1")
 			.each(function(d){
 				/*** ADDS HOVER STATE FOR EACH SENTENCE ****/
 				var timeout = false;
@@ -186,7 +187,11 @@ function draw_pizza(items, settings){
 			arc = makeArcs(d,r, start, end);
 
 			d3.select(this).selectAll("path")
-			.attr("d",arc)
+			.attr("d",arc);
+
+			d3.select(this).selectAll("path").transition()
+			.duration(1000)
+	//		.attr("d",arc)
 			.style("fill",function(d){
 				return color(d);
 			});
