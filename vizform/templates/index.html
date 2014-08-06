@@ -8,15 +8,28 @@
 </div>
 <div id="viz-pane" class="pane row">
 	<div class="col-sm-4">
-		<a href="#" class="close">Close</a>
 		<div class="score">Score: <span class="value"></span></div>
-		<div class="words"></div>
+		<ul class="nav nav-tabs" role="tablist">
+			<li><a href="#settingspane" role="tab" data-toggle="tab">Settings</a></li>
+			<li class="active"><a href="#wordspane" role="tab" data-toggle="tab">Words</a></li>
+			<li><a href="#nounspane" role="tab" data-toggle="tab">Nouns</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane" id="settingspane">
+				<p>Here are some settings for debugging and such like.</p>
+			</div>
+			<div class="tab-pane active" id="wordspane">
+				<p>Hover over a sentece to see where it is in the visualization (don't work yet)</p>
+				<div class="words"></div>
+			</div>
+			<div class="tab-pane" id="nounspane">
+				<p>Click on a word to see its frequency</p>
+				<ul id="nouns" class="nav nav-pills nav-stacked"></ul>
+			</div>
+		</div>
 	</div>
-	<div class="col-sm-7">
+	<div class="col-sm-8">
 		<div id="chart"></div>
-	</div>
-	<div class="col-sm-1">
-		<ul id="nouns" class="nav nav-pills nav-stacked"></ul>
 	</div>
 </div>
 {% endblock %}
