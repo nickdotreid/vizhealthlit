@@ -6129,9 +6129,6 @@ button.close {
     display: none !important;
   }
 }
-body {
-  padding-top: 70px;
-}
 #viz-pane .words {
   color: #666;
 }
