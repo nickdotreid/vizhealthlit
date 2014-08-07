@@ -64,6 +64,7 @@ function draw_pizza(items, settings){
 			}
 		}
 	}
+
 	function makeArcFromObj(obj){
 		return d3.svg.arc()
 		.innerRadius(obj['innerRadius'])
@@ -113,7 +114,7 @@ function draw_pizza(items, settings){
 			if(!direction){
 				start = 0-(radians/2);
 				end = 0+(radians/2);
-				pos['left'] = start;
+				pos['left'] = (Math.PI * 2) + start;
 				pos['right'] = end;
 			}else{
 				start = pos[direction];
@@ -128,6 +129,27 @@ function draw_pizza(items, settings){
 			return {
 				'start':start,
 				'end':end,
+			}
+		}
+	}
+
+	function fullArcs(p,r){
+		var paragraphArea = Math.PI * r * r;
+
+		var makeArcs = makeWedgePositions();
+
+		var degree = d3.scale.linear()
+		.domain([0, p.words.length])
+		.range([0,(Math.PI * 2)]);
+		
+		// describe each ring
+		return function(s){
+			var angles = makeArcs(degree(s.words.length));
+			return {
+				'innerRadius':0,
+				'outerRadius':r,
+				'startAngle':angles['start'],
+				'endAngle':angles['end'],
 			}
 		}
 	}
@@ -164,6 +186,8 @@ function draw_pizza(items, settings){
 		arcPosition = makeWedgePositions();
 		// update elements
 		container.selectAll("g.wedge").each(function(d){
+			var wedge = this;
+
 			var r = chart.height()/2;
 
 			var arcPos = arcPosition(degree(d.words.length));
@@ -171,6 +195,7 @@ function draw_pizza(items, settings){
 			var end = arcPos['end'];
 
 			dArc = describeArcs(d,r, start, end);
+			dWedge = fullArcs(d,r);
 
 			var arc = d3.svg.arc()
 			.innerRadius(0)
@@ -181,29 +206,10 @@ function draw_pizza(items, settings){
 			d3.select(this).selectAll("path")
 			.data(d.sentences)
 			.enter()
-			.append("path").attr("d",arc)
-			.style("fill","#FFFFFF")
-			.attr("stroke","white").attr("stroke-width","1")
-			.each(function(d){
-				/*** ADDS HOVER STATE FOR EACH SENTENCE ****/
-				var timeout = false;
-				$(this).hover(function(){
-					timeout = setTimeout(function(){
-						timeout = false;
-						hoverSentence(d);
-					},150);
-				}, function(){
-					if(timeout){
-						clearTimeout(timeout);
-					}else{
-						clearSentence(d);
-					}
-				});
-			})
+			.append("path");
+
 			d3.select(this).selectAll("path").data(d.sentences)
 			.exit()
-			.transition().duration(250)
-			.style("fill","#FFFFFF")
 			.remove();
 
 			d3.select(this).selectAll("path")
@@ -212,35 +218,73 @@ function draw_pizza(items, settings){
 				var currentArc = {
 					'startAngle':0,
 					'endAngle':0,
-					'innerRadius':0,
-					'outerRadius':0,
+					'innerRadius':start,
+					'outerRadius':end,
 				}
 				if(!d.toArc) d.fromArc = currentArc;
 				else d.fromArc = d.toArc;
+
+				if(settings['currentWedge']){
+					if($(this).parent()[0] == settings['currentWedge']){
+						d.toArc = dWedge(d);	
+					}else{
+						d.toArc = currentArc;
+					}
+					return d;
+				}
 				d.toArc = dArc(d);
 				return d;
 			})
 
-			d3.select(this).selectAll("path")
-			.attr("d",function(d){
-				return d3.svg.arc()(d.toArc);
-			});
-
+			var step = 750
+			var thing = this;
 			d3.select(this).selectAll("path").transition()
-			.duration(2750)
+			.duration(step)
 			.style("fill",function(d){
 				return color(d);
 			})
-			.attrTween("d",function(d){
-				var interp = d3.interpolateObject(d.fromArc, d.toArc);
-				return function(t){
-					var objArc = interp(t);
-					return d3.svg.arc()(objArc);
+			setTimeout(function(){
+				d3.select(thing).selectAll("path").transition()
+				.duration(step)
+				.attrTween("d",function(d){
+					var interp = d3.interpolateObject(d.fromArc, d.toArc);
+					return function(t){
+						var objArc = interp(t);
+						return d3.svg.arc()(objArc);
+					}
+				});
+			},step*1.5);
+		});
+		
+		container.selectAll("path").each(function(d){
+			$(this).unbind("click");
+			$(this).bind("click",function(){
+				if(settings['currentWedge']){
+					settings['currentWedge'] = null;
+				}else{
+					settings['currentWedge'] = $(this).parent()[0];
+				}
+				blit(items,settings);
+			});
+
+			$(this).unbind("mouseenter").unbind("mouseleave");
+			var timeout = false;
+			$(this).hover(function(){
+				timeout = setTimeout(function(){
+					timeout = false;
+					hoverSentence(d);
+				},150);
+			}, function(){
+				if(timeout){
+					clearTimeout(timeout);
+				}else{
+					clearSentence(d);
 				}
 			});
 		});
 	}
 	blit(items,settings);
+
 	return blit;
 }
 
