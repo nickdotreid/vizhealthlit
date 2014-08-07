@@ -186,7 +186,14 @@ function draw_pizza(items, settings){
 		arcPosition = makeWedgePositions();
 		// update elements
 		container.selectAll("g.wedge").each(function(d){
-			var wedge = this;
+			d.sentences.sort(function(a,b){
+				if(a.score < b.score){
+					return -1;
+				}else if(a.score > b.score){
+					return 1;
+				}
+				return 0;
+			}).reverse();
 
 			var r = chart.height()/2;
 
