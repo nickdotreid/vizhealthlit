@@ -64,9 +64,10 @@ class SettingsForm(forms.Form):
     style = forms.ChoiceField(label="Pick a layout", required=True, 
             choices=(
             ('bars','Bar Chart'),
-            ('tree','Tree Map'),
             ('pizza','Pizza Chart'),
-            ))
+            ),
+            initial = 'pizza',
+            )
 
     formula = forms.ChoiceField(label='Pick a reading formula', required=False,
         choices=(
