@@ -111,7 +111,7 @@ def result(request):
         body = Body(form.cleaned_data['text'])
         return HttpResponse(
             json.dumps({
-                'text':form.cleaned_data['text'],
+                'text':body.to_html(),
                 'items':[item.to_json() for item in body.paragraphs],
                 'nouns':[noun.to_json() for key,noun in body.nouns.items()],
                 }),

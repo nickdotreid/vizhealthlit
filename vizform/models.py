@@ -93,6 +93,8 @@ class Sentence(models.Model):
 
         self.negative_words = []
 
+        self.line_break = False
+
         rd = Readability(self.text)
         self.FleschReadingEase = rd.FleschReadingEase()
         self.FleschKincaidGradeLevel = rd.FleschKincaidGradeLevel()
@@ -157,6 +159,11 @@ class Sentence(models.Model):
             'SMOGIndex':self.SMOGIndex,
         }
 
+    def to_html(self):
+        if self.line_break:
+            return self.text + '<br />'
+        return self.text
+
     def __unicode__(self):
         return self.text
 
@@ -174,6 +181,7 @@ class Paragraph(Sentence):
                 s = Sentence(sent)
                 self.sentences.append(s)
                 self.merge(s)
+            s.line_break = True
 
         for s in self.sentences:
             s.similarity = 0
@@ -203,6 +211,9 @@ class Paragraph(Sentence):
         obj['sentences'] = [s.to_json() for s in self.sentences]
         return obj
 
+    def to_html(self):
+        return '<p>' + ' '.join([s.to_html() for s in self.sentences]) + '</p>'
+
 class Body(Paragraph):
 
     def __init__(self, text):
@@ -226,3 +237,6 @@ class Body(Paragraph):
             for n in s.nouns:
                 if n in self.nouns:
                     s.similarity += self.nouns[n].count
+
+    def to_html(self):
+        return ''.join([p.to_html() for p in self.paragraphs])
