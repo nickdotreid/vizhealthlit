@@ -59,6 +59,41 @@ function draw_pizza(items, settings){
 		.endAngle(end);
 	}
 
+	// For any wedge, return a function that describes the inner rings
+	function describeArcs(p,r,start,end){
+		var paragraphFraction = p.words.length/totalLength;
+		var paragraphArea = Math.PI * r * r * paragraphFraction;
+
+		// These will get incremented
+		var rPos = 0;
+		var currentVal = 0;
+		
+		// describe each ring
+		return function(s){
+			var innerRadius = rPos;
+			
+			currentVal += s.words.length;
+			var currentArea = paragraphArea * (currentVal/p.words.length);
+			rPos = Math.sqrt((currentArea*(1/paragraphFraction))/Math.PI);
+
+			outerRadius = rPos;
+			return {
+				'innerRadius':innerRadius,
+				'outerRadius':outerRadius,
+				'startAngle':start,
+				'endAngle':end,
+			}
+		}
+	}
+	function makeArcFromObj(obj){
+		return d3.svg.arc()
+		.innerRadius(obj['innerRadius'])
+		.outerRadius(obj['outerRadius'])
+		.startAngle(obj['startAngle'])
+		.endAngle(obj['endAngle'])
+		();
+	}
+
 	function makeColors(items, settings){
 		var hue = 115;
 		var brightnessKey = 'score';
@@ -184,16 +219,38 @@ function draw_pizza(items, settings){
 			var start = arcPos['start'];
 			var end = arcPos['end'];
 
-			arc = makeArcs(d,r, start, end);
+			dArc = describeArcs(d,r, start, end);
 
 			d3.select(this).selectAll("path")
-			.attr("d",arc);
+			.datum(function(d){
+				var currentArc = {
+					'startAngle':0,
+					'endAngle':0,
+					'innerRadius':0,
+					'outerRadius':0,
+				}
+				if(!d.toArc) d.fromArc = currentArc;
+				else d.fromArc = d.toArc;
+				d.toArc = dArc(d);
+				return d;
+			})
 
+			d3.select(this).selectAll("path")
+			.attr("d",function(d){
+				return d3.svg.arc()(d.toArc);
+			});
+			
 			d3.select(this).selectAll("path").transition()
 			.duration(1000)
-	//		.attr("d",arc)
 			.style("fill",function(d){
 				return color(d);
+			})
+			.attrTween("d",function(d){
+				var interp = d3.interpolateObject(d.fromArc, d.toArc);
+				return function(t){
+					var objArc = interp(t);
+					return d3.svg.arc()(objArc);
+				}
 			});
 		});
 	}
