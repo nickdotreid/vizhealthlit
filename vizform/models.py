@@ -142,17 +142,22 @@ class Sentence(models.Model):
         for n in self.nouns:
             self.nouns[n].analyze(tags)
 
+    def score_active_voice(self):
+        if(len(self.words) < 1): return 0
+        return (len(self.active_words)/float(len(self.words))) - (len(self.passive_words)/float(len(self.words)))
+
+    def score_directness(self):
+        if(len(self.words) < 1): return 0
+        return (len(self.direct_words)/float(len(self.words))) - (len(self.indirect_words)/float(len(self.words)))
+
     def to_json(self):
         return {
             'length':len(self.words),
             'words':self.words,
             'text':self.text,
             'similarity':self.similarity,
-            'active_words':len(self.active_words),
-            'passive_words':len(self.passive_words),
-            'negative_words':len(self.negative_words),
-            'direct_words':len(self.direct_words),
-            'indirect_words':len(self.indirect_words),
+            'activeness': self.score_active_voice(),
+            'directness': self.score_directness(),
             'FleschReadingEase':self.FleschReadingEase,
             'FleschKincaidGradeLevel':self.FleschKincaidGradeLevel,
             'GunningFogIndex':self.GunningFogIndex,
