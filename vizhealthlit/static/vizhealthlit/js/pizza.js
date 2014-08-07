@@ -38,27 +38,6 @@ function draw_pizza(items, settings){
 		return 1-s;
 	}
 
-	function makeArcs(d,r,start,end){
-		var rPos = 0;
-		var paragraphFraction = d.words.length/totalLength;
-		var paragraphArea = Math.PI * r * r * paragraphFraction;
-		var paragraphVal = d.words.length;
-		var currentVal = 0;
-
-		return d3.svg.arc()
-		.innerRadius(function(){
-			return rPos;
-		})
-		.outerRadius(function(d){
-			currentVal += d.words.length;
-			var currentArea = paragraphArea * (currentVal/paragraphVal);
-			rPos = Math.sqrt((currentArea*(1/paragraphFraction))/Math.PI);
-			return rPos;
-		})
-		.startAngle(start)
-		.endAngle(end);
-	}
-
 	// For any wedge, return a function that describes the inner rings
 	function describeArcs(p,r,start,end){
 		var paragraphFraction = p.words.length/totalLength;
@@ -122,33 +101,19 @@ function draw_pizza(items, settings){
 		}
 	}
 
-	var lPos = 0;
-	var rPos = 0;
-	var goingRight = true;
-	function arcPosition(radians){
-		var start = 0;
-		var end = 0;
-
-		if(lPos == rPos){
-			lPos = 0-(radians/2);
-			rPos = 0+(radians/2);
-			start = lPos;
-			end = rPos;
-		}else if(goingRight){
-			goingRight = false;
-			start = rPos;
-			rPos += radians;
-			end = rPos;
-		}else{
-			goingRight = true;
-			start = lPos;
-			lPos -= radians;
-			end = lPos;
-		}
-
-		return {
-			'start':start,
-			'end':end,
+	function makeWedgePositions(){
+		var pos = 0;
+		return function(radians){
+			var start = 0;
+			var end = 0;
+			if(pos == 0) start = 0-(radians/2);
+			else start = pos;
+			end = start + radians;
+			pos = end;
+			return {
+				'start':start,
+				'end':end,
+			}
 		}
 	}
 
@@ -170,7 +135,6 @@ function draw_pizza(items, settings){
 		var sentences = []
 		items.forEach(function(d){
 			d.sentences.forEach(function(s){
-				s.paragraph = d;
 				sentences.push(s);
 			});
 		});
@@ -179,17 +143,25 @@ function draw_pizza(items, settings){
 
 		container.selectAll("g.wedge").data(items)
 		.enter().append("g").attr("class","wedge");
-		container.selectAll("g.wedge").data(items).exit().remove();
 
+//		container.selectAll("g.wedge").data(items).exit().remove();
+
+		arcPosition = makeWedgePositions();
 		// update elements
 		container.selectAll("g.wedge").each(function(d){
 			var r = chart.height()/2;
 
+			var arcPos = arcPosition(degree(d.words.length));
+			var start = arcPos['start'];
+			var end = arcPos['end'];
+
+			dArc = describeArcs(d,r, start, end);
+
 			var arc = d3.svg.arc()
 			.innerRadius(0)
 			.outerRadius(0)
-			.startAngle(0)
-			.endAngle(0);
+			.startAngle(start)
+			.endAngle(end);
 
 			d3.select(this).selectAll("path")
 			.data(d.sentences)
@@ -213,15 +185,14 @@ function draw_pizza(items, settings){
 					}
 				});
 			})
-			d3.select(this).selectAll("path").data(d.sentences).exit().remove();
-
-			var arcPos = arcPosition(degree(d.words.length));
-			var start = arcPos['start'];
-			var end = arcPos['end'];
-
-			dArc = describeArcs(d,r, start, end);
+			d3.select(this).selectAll("path").data(d.sentences)
+			.exit()
+			.transition().duration(250)
+			.style("fill","#FFFFFF")
+			.remove();
 
 			d3.select(this).selectAll("path")
+			.data(d.sentences)
 			.datum(function(d){
 				var currentArc = {
 					'startAngle':0,
@@ -239,9 +210,9 @@ function draw_pizza(items, settings){
 			.attr("d",function(d){
 				return d3.svg.arc()(d.toArc);
 			});
-			
+
 			d3.select(this).selectAll("path").transition()
-			.duration(1000)
+			.duration(2750)
 			.style("fill",function(d){
 				return color(d);
 			})
