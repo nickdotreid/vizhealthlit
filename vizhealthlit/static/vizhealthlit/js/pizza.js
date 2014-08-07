@@ -142,7 +142,7 @@ function draw_pizza(items, settings){
 		.domain([0, p.words.length])
 		.range([0,(Math.PI * 2)]);
 		
-		// describe each ring
+		// describe each wedge
 		return function(s){
 			var angles = makeArcs(degree(s.words.length));
 			return {
@@ -216,10 +216,10 @@ function draw_pizza(items, settings){
 			.data(d.sentences)
 			.datum(function(d){
 				var currentArc = {
-					'startAngle':0,
-					'endAngle':0,
-					'innerRadius':start,
-					'outerRadius':end,
+					'startAngle':start,
+					'endAngle':end,
+					'innerRadius':0,
+					'outerRadius':0,
 				}
 				if(!d.toArc) d.fromArc = currentArc;
 				else d.fromArc = d.toArc;
@@ -234,26 +234,74 @@ function draw_pizza(items, settings){
 				}
 				d.toArc = dArc(d);
 				return d;
-			})
+			});
 
-			var step = 750
-			var thing = this;
-			d3.select(this).selectAll("path").transition()
-			.duration(step)
-			.style("fill",function(d){
-				return color(d);
-			})
-			setTimeout(function(){
-				d3.select(thing).selectAll("path").transition()
+			var step = 750;
+			var trans = d3.select(this).selectAll("path").transition().duration(1);
+
+			if(settings['currentWedge']){
+				trans = trans.transition()
 				.duration(step)
 				.attrTween("d",function(d){
+					// dont animate parts in current wedge
+					if($(this).parent()[0] == settings['currentWedge']) return ;
+					// shrink down other items
 					var interp = d3.interpolateObject(d.fromArc, d.toArc);
+					return function(t){
+						return d3.svg.arc()(interp(t));
+					}
+				});
+
+				trans = trans.transition()
+				.duration(step)
+				.attrTween("d",function(d){
+					if($(this).parent()[0] != settings['currentWedge']) return ;
+					var interp = d3.interpolateObject(d.fromArc, {
+						'startAngle':d.toArc['startAngle'],
+						'endAngle':d.toArc['endAngle'],
+					});
 					return function(t){
 						var objArc = interp(t);
 						return d3.svg.arc()(objArc);
 					}
 				});
-			},step*1.5);
+
+				trans = trans.transition()
+				.duration(step)
+				.attrTween("d",function(d){
+					if($(this).parent()[0] != settings['currentWedge']) return ;
+					var interp = d3.interpolateObject({
+						'innerRadius':d.fromArc['innerRadius'],
+						'outerRadius':d.fromArc['outerRadius'],
+					}, d.toArc);
+					return function(t){
+						var objArc = interp(t);
+						return d3.svg.arc()(objArc);
+					}
+				});
+
+
+			}else{
+				trans = trans.transition()
+				.duration(step/2)
+				.style("fill",function(d){
+					return color(d);
+				});
+
+				trans = trans.transition()
+				.duration(step)
+				.attrTween("d",function(d){
+					// animate angle
+					var toArc = d.toArc;
+					var fromArc = d.fromArc;
+
+					var interp = d3.interpolateObject(fromArc, toArc);
+					return function(t){
+						var objArc = interp(t);
+						return d3.svg.arc()(objArc);
+					}
+				});
+			}
 		});
 		
 		container.selectAll("path").each(function(d){
