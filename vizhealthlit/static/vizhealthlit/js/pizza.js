@@ -102,14 +102,29 @@ function draw_pizza(items, settings){
 	}
 
 	function makeWedgePositions(){
-		var pos = 0;
+		var pos = {
+			'right':0,
+			'left':0,
+		}
+		var direction = false;
 		return function(radians){
 			var start = 0;
 			var end = 0;
-			if(pos == 0) start = 0-(radians/2);
-			else start = pos;
-			end = start + radians;
-			pos = end;
+			if(!direction){
+				start = 0-(radians/2);
+				end = 0+(radians/2);
+				pos['left'] = start;
+				pos['right'] = end;
+			}else{
+				start = pos[direction];
+				if(direction == 'left') radians = radians * -1;
+				end = start + radians;
+				pos[direction] = end;
+			}
+
+			if(direction == 'left') direction='right';
+			else direction = 'left';
+
 			return {
 				'start':start,
 				'end':end,
