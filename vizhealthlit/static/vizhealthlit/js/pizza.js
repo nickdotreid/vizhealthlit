@@ -206,7 +206,8 @@ function draw_pizza(items, settings){
 			d3.select(this).selectAll("path")
 			.data(d.sentences)
 			.enter()
-			.append("path");
+			.append("path")
+			.attr("stroke","white").attr("stroke-width","2");
 
 			d3.select(this).selectAll("path").data(d.sentences)
 			.exit()
