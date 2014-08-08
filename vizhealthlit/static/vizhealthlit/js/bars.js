@@ -69,10 +69,17 @@ function draw_bars(items, settings){
 		if(display_paragraphs){
 			xOffset = (chart.width()/2) - ((items.length*barWidth)/2);
 		}
-
 		var xpos=xOffset;
 		canvas.selectAll("g").each(function(d){
 			ypos=chart.height()/2;
+
+			if(display_paragraphs){
+				var height = 0;
+				d3.select(this).selectAll("rect").each(function(d){
+					height += Math.abs(this.getBoundingClientRect().top - this.getBoundingClientRect().bottom);
+				});
+				ypos -= height/2;
+			}
 
 			y = 0-this.getBBox().height/2 ;
 			if(display_paragraphs) y += this.getBBox().height/4 * jitter(d);
