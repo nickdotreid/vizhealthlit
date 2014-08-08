@@ -74,34 +74,6 @@ function draw_pizza(items, settings){
 		();
 	}
 
-	function makeColors(items, settings){
-		var hue = 115;
-		var brightnessKey = 'score';
-		var saturationKey = 'score';
-
-		if(settings['words'] && settings['words'].length > 0){
-			hue = 21;
-			saturationKey = 'wordScore';
-		}
-
-		var brightness = d3.scale.linear()
-		.domain([
-			d3.min(items,function(d){ return d[brightnessKey]; }),
-			d3.max(items,function(d){ return d[brightnessKey]; })
-		]).range([20,80]);
-		
-		var saturation = d3.scale.linear()
-		.domain([
-			d3.min(items,function(d){ return d[saturationKey]; }),
-			d3.max(items,function(d){ return d[saturationKey]; })
-		]).range([0,100]);
-
-		return function(d){
-			var cstr = "hsl("+hue+","+saturation(d[saturationKey])+"%,"+brightness(d[brightnessKey])+"%)";
-			return d3.hsl(cstr).toString();
-		}
-	}
-
 	function makeWedgePositions(){
 		var pos = {
 			'right':0,
@@ -343,8 +315,5 @@ function draw_pizza(items, settings){
 
 	return blit;
 }
-
-
-
 
 visualization_functions['pizza'] = draw_pizza;
