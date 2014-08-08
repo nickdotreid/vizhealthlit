@@ -24,7 +24,7 @@ function draw_bars(items, settings){
 			return score;
 		}
 	}
-
+	var first = true;
 	var blit = function(items, settings){
 		var jitter = makeJitter();
 		var sentences = []
@@ -59,51 +59,74 @@ function draw_bars(items, settings){
 				width:barWidth,
 				height:function(d){
 					return y(d.length);
-				},				
-			});
-		});
-
-		var xpos=0;
-		canvas.selectAll("g").each(function(d){
-			ypos=0;
-			d3.select(this).selectAll("rect")
-			.transition()
-			.duration(500)
-			.attr({
-				fill:color(d),
-				x:function(d){
-					if(display_paragraphs) return 0;
-					xpos += barWidth;
-					return xpos - barWidth;
 				},
-				y:function(d){
-					if(!display_paragraphs){
-						var height = Math.abs(this.getBoundingClientRect().top - this.getBoundingClientRect().bottom);
-						var y = 0-height/2;
-						y += height * jitter(d);
-						return y;
-					}  
-					var y = ypos;
-					ypos += this.getBBox().height;
-					return y;
-				}
-			});
-
-			d3.select(this).attr("d",function(d){
-				y = 0;
-				if(display_paragraphs) y = 0-this.getBBox().height/2 ;
-				if(display_paragraphs) y += this.getBBox().height/4 * jitter(d);
-				var translate = "translate("+xpos+","+y+")";
-				if(display_paragraphs) xpos += barWidth;
-				return translate;
+				x:chart.width()/2,
+				y:chart.height()/2,		
 			});
 		});
-		
-		canvas.attr("transform",function(){
-			var x = chart.width()/2 - xpos/2;
-			var y = chart.height()/2 - this.getBBox().height/2;
-			return "translate("+ x +","+ y +")";
-		});	
+
+		var xOffset = 0;
+		if(display_paragraphs){
+			xOffset = (chart.width()/2) - ((items.length*barWidth)/2);
+		}
+
+		var xpos=xOffset;
+		canvas.selectAll("g").each(function(d){
+			ypos=chart.height()/2;
+
+			y = 0-this.getBBox().height/2 ;
+			if(display_paragraphs) y += this.getBBox().height/4 * jitter(d);
+
+			var t = d3.select(this).selectAll("rect");
+			var animations = {
+				fill: function(step){
+					t = t
+					.transition()
+					.duration(step)
+					.attr("fill",color);					
+				},
+				x: function(step){
+					t = t.transition()
+					.duration(step)
+					.attr("x",function(d){
+						if(display_paragraphs) return xpos;
+						xpos += barWidth;
+						return xpos - barWidth;
+					});
+					if(display_paragraphs) xpos += barWidth;
+				},
+				y: function(step){
+					t = t.transition()
+					.duration(step)
+					.attr("y",function(d){
+						if(!display_paragraphs){
+							var height = Math.abs(this.getBoundingClientRect().top - this.getBoundingClientRect().bottom);
+							var y = 0-height/2;
+							//y += height * jitter(d);
+							return ypos + y;
+						}  
+						var y = ypos;
+						ypos += this.getBBox().height;
+						return y;
+					});
+				}
+			}
+			if(first){
+				first = false;
+				animations['fill'](10);
+				animations['x'](10);
+				animations['y'](10);
+			}else if(display_paragraphs){
+				animations['fill'](500);
+				animations['y'](500);
+				animations['x'](500);
+			}else{
+				animations['fill'](500);
+				animations['x'](500);
+				animations['y'](500);
+			}
+
+		});
 	}
 
 	blit(items, settings);
