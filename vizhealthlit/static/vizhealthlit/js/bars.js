@@ -2,60 +2,16 @@ function draw_bars(items, settings){
 
 	var display_paragraphs = true;
 
-	var sentences = []
-	items.forEach(function(d){
-		d.sentences.forEach(function(s){
-			s.paragraph = d;
-			sentences.push(s);
-		});
-	});
-
-	var color = d3.scale.linear()
-	.domain([
-		d3.min(sentences,function(d){ return d.score; }),
-		d3.max(sentences,function(d){ return d.score; })
-	]).range(['#3c783e','#00ea13']);
-
 	var chart = $("#chart");
 	var svg = d3.select("#chart").append("svg:svg")
 		.attr("width", chart.width())
 		.attr("height", chart.height());
 
-	var y = d3.scale.linear().domain([
-			0,
-			d3.max(items, function(d){ return d.length; })
-		]).range([
-			0,
-			chart.height()/2
-		]);
-	
-	var barWidth = chart.width()/sentences.length;
-	svg.append("rect").attr({
-		x:0,
-		y:chart.height()/2,
-		width:chart.width(),
-		height:chart.height()/2,
-		fill:"#f5f5f5",
-	})
 	var canvas = svg.append("g");
-	
-	var items = canvas.selectAll("g").data(items).enter().append("g");
 
-	function blit(){
-		items.selectAll("rect").data(function(d){
-			return d.sentences;
-		}).enter().append("rect").attr({
-			width:barWidth,
-			height:function(d){
-				return y(d.length);
-			},
-			fill:function(d){
-				return color(d.score);
-			},
-		});
-
+	function makeJitter(){
 		var momentum = 0;
-		function scoreJitter(d){
+		return function(d){
 			var score = 0;
 			if(d.sentences){
 				if( 3 <= d.sentences.length <= 5) score += 1;
@@ -65,15 +21,56 @@ function draw_bars(items, settings){
 					&& (!settings['words_threshold_max'] || settings['words_threshold_max'] == "" || settings['words_threshold_max'] >= d.words.length)
 					) score += 1;
 			}
-			console.log(score);
 			return score;
-
 		}
+	}
 
-		items[0].forEach(function(d){
+	var blit = function(items, settings){
+		var jitter = makeJitter();
+		var sentences = []
+		items.forEach(function(d){
+			d.sentences.forEach(function(s){
+				s.paragraph = d;
+				sentences.push(s);
+			});
+		});
+
+		var color = makeColors(sentences,settings);
+
+		var y = d3.scale.linear().domain([
+				0,
+				d3.max(items, function(d){ return d.length; })
+			]).range([
+				0,
+				chart.height()/2
+			]);
+		
+		var barWidth = chart.width()/sentences.length;
+		
+		var groups = canvas.selectAll("g")
+		.data(items).enter()
+		.append("g")		
+		.each(function(d){
+			d3.select(this).selectAll("rect.sentence")
+			.data(d.sentences).enter()
+			.append("rect").attr("class","sentence")
+			.attr({
+				fill:"#FFFFFF",
+				width:barWidth,
+				height:function(d){
+					return y(d.length);
+				},				
+			});
+		});
+
+		var xpos=0;
+		canvas.selectAll("g").each(function(d){
 			ypos=0;
-			xpos=0;
-			d3.select(d).selectAll("rect").attr({
+			d3.select(this).selectAll("rect")
+			.transition()
+			.duration(500)
+			.attr({
+				fill:color(d),
 				x:function(d){
 					if(display_paragraphs) return 0;
 					xpos += barWidth;
@@ -83,34 +80,33 @@ function draw_bars(items, settings){
 					if(!display_paragraphs){
 						var height = Math.abs(this.getBoundingClientRect().top - this.getBoundingClientRect().bottom);
 						var y = 0-height/2;
-						y += height * scoreJitter(d);
+						y += height * jitter(d);
 						return y;
 					}  
 					var y = ypos;
 					ypos += this.getBBox().height;
 					return y;
 				}
-			})
-		});
+			});
 
-		var xpos = 0;
-		items.attr("transform",function(d){
-			y = 0;
-			if(display_paragraphs) y = 0-this.getBBox().height/2 ;
-			if(display_paragraphs) y += this.getBBox().height/4 * scoreJitter(d);
-			var translate = "translate("+xpos+","+y+")";
-			xpos += this.getBBox().width;
-			return translate;
+			d3.select(this).attr("d",function(d){
+				y = 0;
+				if(display_paragraphs) y = 0-this.getBBox().height/2 ;
+				if(display_paragraphs) y += this.getBBox().height/4 * jitter(d);
+				var translate = "translate("+xpos+","+y+")";
+				if(display_paragraphs) xpos += barWidth;
+				return translate;
+			});
 		});
 		
 		canvas.attr("transform",function(){
-			var x = chart.width()/2 - this.getBBox().width/2;
+			var x = chart.width()/2 - xpos/2;
 			var y = chart.height()/2 - this.getBBox().height/2;
 			return "translate("+ x +","+ y +")";
-		});		
+		});	
 	}
 
-	blit();
+	blit(items, settings);
 
 	chart.delegate('rect','click',function(){
 		if(display_paragraphs){
@@ -118,8 +114,10 @@ function draw_bars(items, settings){
 		}else{
 			display_paragraphs = true;
 		}
-		blit();
-	})
+		blit(items,settings);
+	});
+
+	return blit;
 }
 
 visualization_functions['bars'] = draw_bars;
