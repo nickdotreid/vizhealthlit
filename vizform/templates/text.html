@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+	$(document).ready(function(){
+		var uploadView = new UploadView({
+			el: $('#upload-pane')[0],
+		});
+	});
+</script>
+{% endblock scripts %}
+
 {% block content %}
-<div id="settings-pane" class="pane">
+<div id="upload-pane" class="pane upload-pane">
 {% crispy form %}
 </div>
 <div id="viz-pane" class="pane row">

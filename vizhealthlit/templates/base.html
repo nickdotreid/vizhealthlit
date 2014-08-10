@@ -24,15 +24,22 @@
         </div>
         {% block scripts %}
         <!-- Enter scripts here -->
+        
         <script type="text/javascript" src="{{STATIC_URL}}jquery/jquery.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}jquery/jquery.cookie.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}d3/d3.min.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}bootstrap/js/tab.js"></script>
-        <script type="text/javascript" src="{{STATIC_URL}}vizhealthlit/js/main.js"></script>
+
+        <script type="text/javascript" src="{{STATIC_URL}}backbone/underscore.js"></script>
+        <script type="text/javascript" src="{{STATIC_URL}}backbone/backbone.js"></script>
+
+        <script type="text/javascript" src="{{STATIC_URL}}vizhealthlit/js/text.js"></script>
+
+<!--        <script type="text/javascript" src="{{STATIC_URL}}vizhealthlit/js/main.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}vizhealthlit/js/bars.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}vizhealthlit/js/tree.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}vizhealthlit/js/pizza.js"></script>
-
+-->
         {% endblock scripts %}
     </body>
 </html>

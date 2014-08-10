@@ -19,24 +19,20 @@ def index(request):
         },context_instance=RequestContext(request))
 
 def text(request):
+    form = TextForm()
+    form.helper.form_action = reverse(result)
     return render_to_response('text.html',{
-        'form':TextForm(),
+        'form':form,
         }, context_instance=RequestContext(request))
 
 def result(request):
-    if not request.POST:
-        return HttpResponseRedirect(reverse(index))
-    
-    form = TextForm(request.POST)
-    form.helper.form_action = reverse(result)
-    
-    data = []
-    longest = 1
     if request.is_ajax():
+        form = TextForm(request.POST)
+        form.helper.form_action = reverse(result)
         if not form.is_valid():
             return HttpResponse(
             json.dumps({
-                'form':render_crispy_form(SettingsForm(request.POST), context=RequestContext(request)),
+                'form':render_crispy_form(form, context=RequestContext(request)),
                 }),
             content_type="application/json"
             )
@@ -49,6 +45,8 @@ def result(request):
                 }),
             content_type="application/json"
             )
+    if not request.POST:
+        return HttpResponseRedirect(reverse(index))
     return render_to_response('results.html',{
         'form': form,
         'data':data,
