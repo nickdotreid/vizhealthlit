@@ -17,6 +17,11 @@
 			$("#viz-pane").show();
 		});
 
+		var textView = new TextView({
+			model: text,
+			el: $("#text")[0],
+		});
+
 		$("#upload-pane").show();
 		$("#viz-pane").hide();
 	});

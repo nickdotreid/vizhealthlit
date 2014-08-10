@@ -33,3 +33,19 @@ var UploadView = Backbone.View.extend({
 		});
 	},
 });
+
+var TextView = Backbone.View.extend({
+	tagName:"div",
+	className:"text-view",
+	events:{
+
+	},
+	initialize: function() {
+		this.listenTo(this.model, "change", this.render);
+	},
+	render: function(){
+		this.$el.html(this.model.get("text"));
+
+		return this;
+	}
+})
