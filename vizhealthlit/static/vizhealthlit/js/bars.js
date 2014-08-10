@@ -100,7 +100,6 @@ function draw_bars(items, settings){
 						xpos += barWidth;
 						return xpos - barWidth;
 					});
-					if(display_paragraphs) xpos += barWidth;
 				},
 				y: function(step){
 					t = t.transition()
@@ -132,7 +131,7 @@ function draw_bars(items, settings){
 				animations['x'](500);
 				animations['y'](500);
 			}
-
+			if(display_paragraphs) xpos += barWidth;
 		});
 	}
 
