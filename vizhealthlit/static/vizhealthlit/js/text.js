@@ -1,7 +1,7 @@
 var TextModel = Backbone.Model.extend({
 	initialize:function(){
 		var model = this;
-		this.on("change:items",function(){
+		this.on("change",function(){
 			model.generateScores();
 		});
 	},
@@ -28,7 +28,11 @@ var TextModel = Backbone.Model.extend({
 		var settings = this.getSettings();
 		var items = this.get("items");
 		if(!items) return false;
-		if(settings['formula'] == 'custom'){
+		if(items[0][settings['formula']]){
+			function score(d, type){
+				d.score = d[settings['formula']];
+			}
+		}else{
 			if(!settings['sentences_threshold_min']) settings['sentences_threshold_min'] = d3.min(items,function(d){ return d.sentences.length; });
 			if(!settings['sentences_threshold_max']) settings['sentences_threshold_max'] = d3.max(items,function(d){ return d.sentences.length; });
 
@@ -54,14 +58,8 @@ var TextModel = Backbone.Model.extend({
 
 				if(d.sentences) d.sentences.forEach(function(s){ d.score += s.score; });
 
-				d.score += d.active_words - d.passive_words;
+				// add is score for weighted custom stuff
 			}
-		}else if(items[0][settings['formula']]){
-			function score(d, type){
-				d.score = d[settings['formula']];
-			}
-		}else{
-			return;
 		}
 
 		function wordScore(d){
@@ -89,7 +87,8 @@ var TextModel = Backbone.Model.extend({
 			d.sentences.forEach(function(s){ if(s.score > sentences_max) s.score = sentences_max; });
 		});
 
-		return items;
+		this.trigger("updated");
+		return this;
 	}
 });
 
@@ -132,7 +131,7 @@ var TextView = Backbone.View.extend({
 
 	},
 	initialize: function() {
-		this.listenTo(this.model, "change", this.render);
+		this.listenTo(this.model, "updated", this.render);
 	},
 	render: function(){
 		var view = this;
@@ -150,7 +149,7 @@ var TextView = Backbone.View.extend({
 		if(item.sentences.length == 1){
 			view.$(".score:last").addClass("paragraph-score");
 		}else{
-			var formula = this.model.get("formula");
+			var formula = 'score';
 			$(".score:last",view.$el).after('<span class="score paragraph-score">('+formatNumber(item[formula]) + ')</span>');
 		}
 	},
@@ -158,7 +157,7 @@ var TextView = Backbone.View.extend({
 		var html = this.$el.html();
 		var parts = html.split(item.text);
 
-		var formula = this.model.get("formula");
+		var formula = 'score';
 		if(parts[0]) this.$el.html(parts[0]);
 		this.$el.html(this.$el.html() + item.text + "<span class='score'>"+ "("+ formatNumber(item[formula]) +")" +"</span>");
 		if(parts[1]) this.$el.html(this.$el.html() + parts[1]);
