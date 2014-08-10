@@ -22,6 +22,11 @@
 			el: $("#text")[0],
 		});
 
+		var settingsView = new SettingsView({
+			model: text,
+			el:$("#settings")[0],
+		});
+
 		$("#upload-pane").show();
 		$("#viz-pane").hide();
 	});
@@ -33,9 +38,13 @@
 {% crispy form %}
 </div>
 <div id="viz-pane" class="pane row">
-	<div class="col-sm-3">
-		<ul class="nav nav-pills nav-stacked">
-			<li class="active"><a href="#">All</a></li>
+	<div id="settings" class="col-sm-3">
+		<ul class="scoring nav nav-pills nav-stacked">
+			<li data-score="reading-ease" class="reading-ease"><a href="#">Reading Ease</a></li>
+			<li data-score="reading-level" class="reading-level"><a href="#">Reading Level</a></li>
+			<li data-score="gunning-fog" class="gunning-fog"><a href="#">Gunning Fog</a></li>
+			<li data-score="smog" class="smog"><a href="#">SMOG</a></li>
+			<li data-score="custom" class="active custom"><a href="#">Custom</a></li>
 		</ul>	
 	</div>	
 	<div class="col-sm-9">

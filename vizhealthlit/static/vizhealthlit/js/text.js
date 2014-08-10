@@ -45,7 +45,24 @@ var TextView = Backbone.View.extend({
 	},
 	render: function(){
 		this.$el.html(this.model.get("text"));
-
 		return this;
+	}
+});
+
+var SettingsView = Backbone.View.extend({
+	events:{
+		"click .scoring a":"scoreUpdate",
+	},
+	render:function(event){
+		return this;
+	},
+	scoreUpdate: function(event){
+		event.preventDefault();
+		this.$(".scoring .active").removeClass("active");
+		var button = $(event.currentTarget).parents("li:first");
+		button.addClass("active");
+		this.model.set({
+			'scoring':button.data("score"),
+		});
 	}
 })
