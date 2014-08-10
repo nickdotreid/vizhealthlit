@@ -71,21 +71,19 @@ var TextView = Backbone.View.extend({
 	},
 });
 
-function formatNumber(num){
-	return Math.round(num *100)/100;
-}
-
 var SettingsView = Backbone.View.extend({
 	events:{
-		"click .formulas a":"scoreUpdate",
+		"click .formulas a":"formulaChange",
+		"change form input":"settingsChange",
 	},
 	initialize:function(){
 		this.$('form').hide();
+		if(this.$('.formulas [data-formula=custom]').hasClass("active")) this.$('form').show();
 	},
 	render:function(event){
 		return this;
 	},
-	scoreUpdate: function(event){
+	formulaChange: function(event){
 		event.preventDefault();
 		this.$(".formulas .active").removeClass("active");
 		var button = $(event.currentTarget).parents("li:first");
@@ -95,5 +93,31 @@ var SettingsView = Backbone.View.extend({
 		});
 		if(button.data("formula") == 'custom') this.$("form").show();
 		else this.$("form").hide();
+	},
+	settingsChange: function(event){
+		this.model.set(this.$('form').serializeObject());
 	}
 });
+
+
+function formatNumber(num){
+	return Math.round(num *100)/100;
+}
+
+// FROM:: http://stackoverflow.com/questions/1184624/convert-form-data-to-js-object-with-jquery
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};

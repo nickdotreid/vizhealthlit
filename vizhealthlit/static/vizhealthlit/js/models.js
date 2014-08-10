@@ -21,6 +21,8 @@ var TextModel = Backbone.Model.extend({
 	getSettings: function(){
 		return {
 			formula:this.get("formula"),
+			paragraph_length_threshold:this.get("paragraph_length_threshold"),
+			sentence_length_threshold:this.get("sentence_length_threshold"),
 		};
 	},
 	generateScores: function(){
@@ -44,10 +46,12 @@ var TextModel = Backbone.Model.extend({
 				var length = d.words.length;
 				if(d.sentences) length = d.sentences.length;
 				if(length > length_max){
-					d.score += -1;
+					d.score += (length_max - length)/length;
 				}
 
-				// add is score for weighted custom stuff
+				d.score += (d.positive_words.length/d.words.length) - (d.negative_words.length/d.words.length);
+				d.score += (d.active_words.length/d.words.length) - (d.passive_words.length/d.words.length);
+				d.score += (d.direct_words.length/d.words.length) - (d.indirect_words.length/d.words.length);
 			}
 		}
 

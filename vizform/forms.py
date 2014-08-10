@@ -37,24 +37,27 @@ class SettingsForm(forms.Form):
 
         self.helper.layout = Layout(
             Fieldset(
-                "Complexity Settings",
-                Div(
-                    Div('sentences_threshold_min', css_class="col-xs-6"),
-                    Div('sentences_threshold_max', css_class="col-xs-6"),
-                    css_class="row"
-                    ),
-                Div(
-                    Div('words_threshold_min', css_class="col-xs-6"),
-                    Div('words_threshold_max', css_class="col-xs-6"),
-                    css_class="row"
+                "Positiveness",
+                "positiveness_weight",
                 ),
-
-            ),
-            Submit('submit', 'Submit'),
+            Fieldset(
+                "Activeness",
+                "activeness_weight",
+                ),
+            Fieldset(
+                "Directness",
+                "directness_weight",
+                ),
+            Fieldset(
+                "Complexity",
+                'complexity_weight',
+                'sentence_length_threshold',
+                'paragraph_length_threshold',
+                ),
             )
-
-    words_threshold_min = forms.CharField(required=False, label="Min", initial=8)
-    words_threshold_max = forms.CharField(required=False, label="Max", initial=10)
-
-    sentences_threshold_min = forms.CharField(required=False, label="S Min", initial=3)
-    sentences_threshold_max = forms.CharField(required=False, label="S Max", initial=5)
+    positiveness_weight = forms.CharField(required=True, label="Weight", initial=1)
+    activeness_weight = forms.CharField(required=True, label="Weight", initial=1)
+    directness_weight = forms.CharField(required=True, label="Weight", initial=1)
+    complexity_weight = forms.CharField(required=True, label="Weight", initial=1)
+    sentence_length_threshold = forms.CharField(required=False, label="Words Max", initial=10)
+    paragraph_length_threshold = forms.CharField(required=False, label="Sentence Max", initial=5)
