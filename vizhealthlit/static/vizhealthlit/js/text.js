@@ -1,3 +1,7 @@
+var TextModel = Backbone.Model.extend({
+
+});
+
 var UploadView = Backbone.View.extend({
 	tagName: "div",
 	className: "text-upload",
@@ -9,6 +13,7 @@ var UploadView = Backbone.View.extend({
 		var view = this;
 		var form = this.$('form');
 		this.$el.addClass("loading");
+
 		$.ajax({
 			url: form.attr("action"),
 			type: form.attr("method"),
@@ -22,7 +27,8 @@ var UploadView = Backbone.View.extend({
 					form.remove();
 					return;
 				}
-				// update to model
+				view.model.set(data);
+				view.trigger("uploaded");
 			},
 		});
 	},

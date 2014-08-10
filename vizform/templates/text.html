@@ -5,9 +5,20 @@
 {{block.super}}
 <script type="text/javascript">
 	$(document).ready(function(){
+		var text = new TextModel();
+
 		var uploadView = new UploadView({
+			model: text,
 			el: $('#upload-pane')[0],
 		});
+
+		uploadView.on("uploaded",function(){
+			$("#upload-pane").hide();
+			$("#viz-pane").show();
+		});
+
+		$("#upload-pane").show();
+		$("#viz-pane").hide();
 	});
 </script>
 {% endblock scripts %}
