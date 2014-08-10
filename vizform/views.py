@@ -21,8 +21,13 @@ def index(request):
 def text(request):
     form = TextForm()
     form.helper.form_action = reverse(result)
+
+    settings = SettingsForm()
+    settings.helper.form_action = reverse(result)
+
     return render_to_response('text.html',{
         'form':form,
+        'settings':settings,
         }, context_instance=RequestContext(request))
 
 def result(request):

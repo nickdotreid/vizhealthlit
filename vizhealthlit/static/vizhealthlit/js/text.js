@@ -173,6 +173,9 @@ var SettingsView = Backbone.View.extend({
 	events:{
 		"click .formulas a":"scoreUpdate",
 	},
+	initialize:function(){
+		this.$('form').hide();
+	},
 	render:function(event){
 		return this;
 	},
@@ -184,5 +187,7 @@ var SettingsView = Backbone.View.extend({
 		this.model.set({
 			'formula':button.data("formula"),
 		});
+		if(button.data("formula") == 'custom') this.$("form").show();
+		else this.$("form").hide();
 	}
 })
