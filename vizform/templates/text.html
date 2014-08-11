@@ -32,22 +32,26 @@
 {% crispy form %}
 </div>
 <div id="viz-pane" class="pane row">
-	<div class="toobar row">
-		<div class="col-sm-3">
-			<ul class="nav nav-pills nav-sidebar">
-				<li class="active"><a href="#formula" data-target="settings">Settings</a></li>
-				<li class=""><a href="#overview" data-target="overview" >Text</a></li>
-				<li class=""><a href="#topics" data-target="topics">Topics</a></li>
-			</ul>
-		</div>
-		<div class="col-sm-9">
-			<ul class="nav nav-pills nav-visualization">
-				<li class="active"><a href="#text">Text</a></li>
-				<li class=""><a href="#bars">Bar Chart</a></li>
-				<li class=""><a href="#pizza">Pizza</a></li>
-			</ul>
+	<nav class="navbar navbar-default" role="navigation">
+  	<div class="container-fluid">
+		<div class="toobar row">
+			<div class="col-sm-3">
+				<ul class="nav nav-pills nav-sidebar">
+					<li class="active"><a href="#formula" data-target="settings">Settings</a></li>
+					<li class=""><a href="#overview" data-target="overview" >Text</a></li>
+					<li class=""><a href="#topics" data-target="topics">Topics</a></li>
+				</ul>
+			</div>
+			<div class="col-sm-9">
+				<ul class="nav nav-pills nav-visualization">
+					<li class="active"><a href="#text">Text</a></li>
+					<li class=""><a href="#bars">Bar Chart</a></li>
+					<li class=""><a href="#pizza">Pizza</a></li>
+				</ul>
+			</div>
 		</div>
 	</div>
+	</nav>
 
 	<div class="sidebar col-sm-3">
 		<div id="settings" class="pane">
