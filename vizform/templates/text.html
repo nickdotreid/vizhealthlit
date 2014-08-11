@@ -15,18 +15,17 @@
 		uploadView.on("uploaded",function(){
 			$("#upload-pane").hide();
 			$("#viz-pane").show();
-		});
 
-		var textView = new TextView({
-			model: text,
-			el: $("#text")[0],
-		});
+			var textView = new TextView({
+				model: text,
+				el: $("#text")[0],
+			});
 
-		var settingsView = new SettingsView({
-			model: text,
-			el:$("#settings")[0],
+			var settingsView = new SettingsView({
+				model: text,
+				el:$("#settings")[0],
+			});
 		});
-
 		$("#upload-pane").show();
 		$("#viz-pane").hide();
 	});
@@ -61,6 +60,9 @@
 						<p>Here are some of the words identified by this function.</p>
 						<ul>
 							<li><strong>Positive Words: </strong><div class="word-list" data-word-type="positive_words"></div></li>
+							<li><strong>Negative Words: </strong><div class="word-list" data-word-type="negative_words"></div></li>
+							<li><strong>Active Words: </strong><div class="word-list" data-word-type="active_words"></div></li>
+							<li><strong>Passive Words: </strong><div class="word-list" data-word-type="passive_words"></div></li>
 						</ul>
 
 					</div>

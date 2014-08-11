@@ -89,6 +89,21 @@ var TextModel = Backbone.Model.extend({
 		return this;
 	},
 	getWords: function(type){
-		return [];
+		var words = {};
+		var items = this.get("items");
+		if(!items) return [];
+		items.forEach(function(item){
+			if(type && item[type]){
+				_.each(item[type],function(w){
+					if(!words[w]){
+						words[w] = 0;
+					}
+					words[w]++;
+				});
+			}
+		});
+		return _.sortBy(_.keys(words), function(w){
+			return words[w];
+		});
 	}
 });

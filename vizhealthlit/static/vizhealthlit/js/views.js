@@ -107,8 +107,8 @@ var SettingsView = Backbone.View.extend({
 	},
 	createWordLists: function(event){
 		var model = this.model;
-		this.$('.word-list').each(function(item){
-			var list = $(item);
+		this.$('.word-list').each(function(){
+			var list = $(this);
 			var attr = list.data('word-type');
 			var words = model.getWords(attr);
 			list.html(words.join(", "));
