@@ -95,7 +95,7 @@ var SettingsView = Backbone.View.extend({
 		else this.$("form").hide();
 	},
 	settingsChange: function(event){
-		this.model.set(this.$('form').serializeObject());
+		this.model.setSetting(this.$('form').serializeObject());
 	}
 });
 

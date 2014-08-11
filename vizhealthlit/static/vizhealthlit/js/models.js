@@ -18,11 +18,21 @@ var TextModel = Backbone.Model.extend({
 		});
 		return sentences;
 	},
+	setSetting:function(hash){
+		for(key in hash){
+			this.set(key,hash[key]);
+		}
+		this.generateScores();
+		return this;
+	},
 	getSettings: function(){
 		return {
 			formula:this.get("formula"),
 			paragraph_length_threshold:this.get("paragraph_length_threshold"),
 			sentence_length_threshold:this.get("sentence_length_threshold"),
+			positiveness_weight:this.get('positiveness_weight'),
+			acitveness_weight:this.get('acitveness_weight'),
+			directness_weight:this.get('directness_weight'),
 		};
 	},
 	generateScores: function(){
@@ -37,7 +47,10 @@ var TextModel = Backbone.Model.extend({
 		}else{
 			if(!settings['paragraph_length_threshold']) settings['paragraph_length_threshold'] = _.max(items,function(d){ return d.sentences.length; });
 			if(!settings['sentence_length_threshold']) settings['sentence_length_threshold'] = _.max(sentences,function(d){ return d.words.length; });
-			
+			if(!settings['positiveness_weight']) settings['positiveness_weight'] = 1;
+			if(!settings['acitveness_weight']) settings['acitveness_weight'] = 1;
+			if(!settings['directness_weight']) settings['directness_weight'] = 1;
+
 			function score(d, type){
 				d.score = 0;
 				if(d.sentences) d.sentences.forEach(function(s){ d.score += s.score; });
@@ -49,9 +62,9 @@ var TextModel = Backbone.Model.extend({
 					d.score += (length_max - length)/length;
 				}
 
-				d.score += (d.positive_words.length/d.words.length) - (d.negative_words.length/d.words.length);
-				d.score += (d.active_words.length/d.words.length) - (d.passive_words.length/d.words.length);
-				d.score += (d.direct_words.length/d.words.length) - (d.indirect_words.length/d.words.length);
+				d.score += (d.positive_words.length/d.words.length) - (d.negative_words.length/d.words.length) * settings['positiveness_weight'];
+				d.score += (d.active_words.length/d.words.length) - (d.passive_words.length/d.words.length) * settings['acitveness_weight'];
+				d.score += (d.direct_words.length/d.words.length) - (d.indirect_words.length/d.words.length) * settings['directness_weight'];
 			}
 		}
 

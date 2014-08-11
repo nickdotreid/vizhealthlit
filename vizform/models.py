@@ -148,13 +148,14 @@ class Sentence(models.Model):
             'length':len(self.words),
             'words':self.words,
             'text':self.text,
-            'similarity':self.similarity,
+
             'direct_words': self.direct_words,
             'indirect_words':self.indirect_words,
             'positive_words':self.positive_words,
             'negative_words':self.negative_words,
             'active_words':self.active_words,
             'passive_words':self.passive_words,
+            
             'FleschReadingEase':self.FleschReadingEase,
             'FleschKincaidGradeLevel':self.FleschKincaidGradeLevel,
             'GunningFogIndex':self.GunningFogIndex,
