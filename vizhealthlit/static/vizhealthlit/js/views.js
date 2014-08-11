@@ -83,6 +83,7 @@ var SettingsView = Backbone.View.extend({
 		"click .formulas .active a":"showModal",
 	},
 	initialize:function(){
+		this.createWordLists();
 
 	},
 	render:function(event){
@@ -103,9 +104,17 @@ var SettingsView = Backbone.View.extend({
 	showModal: function(event){
 		var button = $(event.currentTarget).parents("li:first");
 		this.$(".modal."+button.data("formula")).modal();
+	},
+	createWordLists: function(event){
+		var model = this.model;
+		this.$('.word-list').each(function(item){
+			var list = $(item);
+			var attr = list.data('word-type');
+			var words = model.getWords(attr);
+			list.html(words.join(", "));
+		});
 	}
 });
-
 
 function formatNumber(num){
 	return Math.round(num *100)/100;

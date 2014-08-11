@@ -87,5 +87,8 @@ var TextModel = Backbone.Model.extend({
 
 		this.trigger("updated");
 		return this;
+	},
+	getWords: function(type){
+		return [];
 	}
 });
