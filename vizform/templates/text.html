@@ -16,15 +16,10 @@
 			$("#upload-pane").hide();
 			$("#viz-pane").show();
 
-			var textView = new TextView({
-				model: text,
-				el: $("#text")[0],
-			});
-
-			var settingsView = new SettingsView({
-				model: text,
-				el:$("#settings")[0],
-			});
+			var vizPane = new VizPaneView({
+				model:text,
+				el:$("#viz-pane")[0],
+			})
 		});
 		$("#upload-pane").show();
 		$("#viz-pane").hide();
@@ -37,46 +32,69 @@
 {% crispy form %}
 </div>
 <div id="viz-pane" class="pane row">
-	<div id="settings" class="col-sm-3">
-		<ul class="formulas nav nav-pills nav-stacked">
-			<li data-formula="FleschReadingEase"><a href="#">Reading Ease</a></li>
-			<li data-formula="FleschKincaidGradeLevel"><a href="#">Reading Level</a></li>
-			<li data-formula="GunningFogIndex"><a href="#">Gunning Fog</a></li>
-			<li data-formula="SMOGIndex"><a href="#">SMOG</a></li>
-			<li data-formula="custom" class="active custom"><a href="#">Custom</a></li>
-		</ul>
+	<div class="toobar row">
+		<div class="col-sm-3">
+			<ul class="nav nav-pills nav-sidebar">
+				<li class="active"><a href="#formula" data-target="settings">Settings</a></li>
+				<li class=""><a href="#overview" data-target="overview" >Text</a></li>
+				<li class=""><a href="#topics" data-target="topics">Topics</a></li>
+			</ul>
+		</div>
+		<div class="col-sm-9">
+			<ul class="nav nav-pills nav-visualization">
+				<li class="active"><a href="#text">Text</a></li>
+				<li class=""><a href="#bars">Bar Chart</a></li>
+				<li class=""><a href="#pizza">Pizza</a></li>
+			</ul>
+		</div>
+	</div>
 
-		<div class="custom modal fade">
-		  <div class="modal-dialog">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-		        <h4 class="modal-title">Custom Readability Formula</h4>
-		      </div>
-		      <div class="modal-body">
-				<div class="row">
-					<div class="col-xs-6">
-						<p>This is a readability formula that is still under development.</p>
-						<p>Here are some of the words identified by this function.</p>
-						<ul>
-							<li><strong>Positive Words: </strong><div class="word-list" data-word-type="positive_words"></div></li>
-							<li><strong>Negative Words: </strong><div class="word-list" data-word-type="negative_words"></div></li>
-							<li><strong>Active Words: </strong><div class="word-list" data-word-type="active_words"></div></li>
-							<li><strong>Passive Words: </strong><div class="word-list" data-word-type="passive_words"></div></li>
-						</ul>
+	<div class="sidebar col-sm-3">
+		<div id="settings" class="pane">
+			<ul class="formulas nav nav-pills nav-stacked">
+				<li data-formula="FleschReadingEase"><a href="#">Reading Ease</a></li>
+				<li data-formula="FleschKincaidGradeLevel"><a href="#">Reading Level</a></li>
+				<li data-formula="GunningFogIndex"><a href="#">Gunning Fog</a></li>
+				<li data-formula="SMOGIndex"><a href="#">SMOG</a></li>
+				<li data-formula="custom" class="active custom"><a href="#">Custom</a></li>
+			</ul>
 
+			<div class="custom modal fade">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+			        <h4 class="modal-title">Custom Readability Formula</h4>
+			      </div>
+			      <div class="modal-body">
+					<div class="row">
+						<div class="col-xs-6">
+							<p>This is a readability formula that is still under development.</p>
+							<p>Here are some of the words identified by this function.</p>
+							<ul>
+								<li><strong>Positive Words: </strong><div class="word-list" data-word-type="positive_words"></div></li>
+								<li><strong>Negative Words: </strong><div class="word-list" data-word-type="negative_words"></div></li>
+								<li><strong>Active Words: </strong><div class="word-list" data-word-type="active_words"></div></li>
+								<li><strong>Passive Words: </strong><div class="word-list" data-word-type="passive_words"></div></li>
+							</ul>
+
+						</div>
+						<div class="col-xs-6">
+							<p>Update these settings to change how the visualization functions.</p>
+							{% crispy settings %}
+						</div>
 					</div>
-					<div class="col-xs-6">
-						<p>Update these settings to change how the visualization functions.</p>
-						{% crispy settings %}
-					</div>
-				</div>
-		      </div>
-		    </div><!-- /.modal-content -->
-		  </div><!-- /.modal-dialog -->
-		</div><!-- /.modal -->
+			      </div>
+			    </div><!-- /.modal-content -->
+			  </div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+		</div>
+		<div id="overview" class="pane">
 
+		</div>
+		<div id="topics" class="pane">
 
+		</div>
 	</div>	
 	<div class="col-sm-9">
 		<div id="text"></div>

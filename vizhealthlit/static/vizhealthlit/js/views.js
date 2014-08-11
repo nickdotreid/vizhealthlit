@@ -30,6 +30,55 @@ var UploadView = Backbone.View.extend({
 	},
 });
 
+var VizPaneView = Backbone.View.extend({
+	events:{
+		"click .nav-visualization a":"updateViz",
+		"click .nav-sidebar a":"updateSidebar",
+	},
+	initialize: function(){
+		var view = this;
+
+		var settingsView = new SettingsView({
+			model: this.model,
+			el: this.$("#settings")[0],
+		});
+
+		this.$(".nav-visualization .active a").each(function(){
+			view.makeViz($(this).data("type"));
+		});
+	},
+	render: function(){
+
+	},
+	updateSidebar: function(event){
+		event.preventDefault();
+
+		this.$(".nav-sidebar .active").removeClass("active");
+		$(event.currentTarget).parents("li:first").addClass("active");
+
+		this.$(".sidebar .pane").hide();
+		var targetId = $(event.currentTarget).data("target");
+		this.$("#"+targetId).show();
+	},
+	updateViz: function(event){
+		event.preventDefault();
+		
+		this.$(".nav-visualization .active").removeClass("active");
+		$(event.currentTarget).parents("li:first").addClass("active");
+
+		var type = $(event.currentTarget).data("type");
+		this.makeViz(type);
+	},
+	makeViz: function(type){
+		if(this.viz) this.viz.remove();
+		this.viz = new TextView({
+			model: this.model,
+			el: this.$("#text")[0],
+		});
+		return this.viz;
+	}
+})
+
 var TextView = Backbone.View.extend({
 	tagName:"div",
 	className:"text-view",
