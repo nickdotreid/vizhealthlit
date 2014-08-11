@@ -155,6 +155,11 @@ var PizzaVizView = VizView.extend({
 			container.selectAll("g.wedge").data(items)
 			.enter().append("g").attr("class","wedge");
 
+			var active_wedge = _.reduce(view.$(".wedge"),function(m,w){
+				if(!m) return $(w).attr("class").indexOf("active") > -1;
+				return m;
+			}, false);
+
 			arcPosition = makeWedgePositions();
 			// update elements
 			container.selectAll("g.wedge").each(function(d){
@@ -204,8 +209,8 @@ var PizzaVizView = VizView.extend({
 					if(!d.toArc) d.fromArc = currentArc;
 					else d.fromArc = d.toArc;
 
-					if(settings['currentWedge']){
-						if($(this).parent()[0] == settings['currentWedge']){
+					if(active_wedge){
+						if($(this).parent().attr("class").indexOf("active") > -1){
 							d.toArc = dWedge(d);	
 						}else{
 							d.toArc = currentArc;
@@ -219,12 +224,12 @@ var PizzaVizView = VizView.extend({
 				var step = 750;
 				var trans = d3.select(this).selectAll("path").transition().duration(1);
 
-				if(settings['currentWedge']){
+				if(active_wedge){
 					trans = trans.transition()
 					.duration(step)
 					.attrTween("d",function(d){
 						// dont animate parts in current wedge
-						if($(this).parent()[0] == settings['currentWedge']) return ;
+						if($(this).parent().attr("class").indexOf("active") > -1) return ;
 						// shrink down other items
 						var interp = d3.interpolateObject(d.fromArc, d.toArc);
 						return function(t){
@@ -235,7 +240,7 @@ var PizzaVizView = VizView.extend({
 					trans = trans.transition()
 					.duration(step)
 					.attrTween("d",function(d){
-						if($(this).parent()[0] != settings['currentWedge']) return ;
+						if($(this).parent().attr("class").indexOf("active") < 0) return ;
 						var interp = d3.interpolateObject(d.fromArc, {
 							'startAngle':d.toArc['startAngle'],
 							'endAngle':d.toArc['endAngle'],
@@ -249,7 +254,7 @@ var PizzaVizView = VizView.extend({
 					trans = trans.transition()
 					.duration(step)
 					.attrTween("d",function(d){
-						if($(this).parent()[0] != settings['currentWedge']) return ;
+						if($(this).parent().attr("class").indexOf("active") < 0) return ;
 						var interp = d3.interpolateObject({
 							'innerRadius':d.fromArc['innerRadius'],
 							'outerRadius':d.fromArc['outerRadius'],
@@ -259,8 +264,6 @@ var PizzaVizView = VizView.extend({
 							return d3.svg.arc()(objArc);
 						}
 					});
-
-
 				}else{
 					trans = trans.transition()
 					.duration(step/2)
@@ -287,11 +290,8 @@ var PizzaVizView = VizView.extend({
 			container.selectAll("path").each(function(d){
 				$(this).unbind("click");
 				$(this).bind("click",function(){
-					if(settings['currentWedge']){
-						settings['currentWedge'] = null;
-					}else{
-						settings['currentWedge'] = $(this).parent()[0];
-					}
+					view.$(".wedge.active").attr("class","wedge");
+					if(!active_wedge) $(this).parent().attr("class","wedge active");
 					blit();
 				});
 
@@ -315,6 +315,7 @@ var PizzaVizView = VizView.extend({
 
 		this.stopListening(this.model);
 		this.listenTo(this.model,'updated',function(){
+			view.$(".wedge.active").attr("class","wedge");
 			blit();
 		});
 
