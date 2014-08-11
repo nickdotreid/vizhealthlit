@@ -75,10 +75,10 @@ var SettingsView = Backbone.View.extend({
 	events:{
 		"click .formulas a":"formulaChange",
 		"change form input":"settingsChange",
+		"click .formulas .active a":"showModal",
 	},
 	initialize:function(){
-		this.$('form').hide();
-		if(this.$('.formulas [data-formula=custom]').hasClass("active")) this.$('form').show();
+
 	},
 	render:function(event){
 		return this;
@@ -91,11 +91,13 @@ var SettingsView = Backbone.View.extend({
 		this.model.set({
 			'formula':button.data("formula"),
 		});
-		if(button.data("formula") == 'custom') this.$("form").show();
-		else this.$("form").hide();
 	},
 	settingsChange: function(event){
 		this.model.setSetting(this.$('form').serializeObject());
+	},
+	showModal: function(event){
+		var button = $(event.currentTarget).parents("li:first");
+		this.$(".modal."+button.data("formula")).modal();
 	}
 });
 
