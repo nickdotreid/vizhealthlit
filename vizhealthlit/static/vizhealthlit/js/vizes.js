@@ -1,5 +1,7 @@
 var VizView = Backbone.View.extend({
 	initialize: function() {
+		var el = $('<div></div>').appendTo(this.$el);
+		this.setElement(el[0]);
 		this.listenTo(this.model, "updated", this.update);
 		this.render();
 	}

@@ -73,7 +73,7 @@ var VizPaneView = Backbone.View.extend({
 		if(this.viz) this.viz.remove();
 		this.viz = new TextView({
 			model: this.model,
-			el: this.$("#text")[0],
+			el: this.$("#chart")[0],
 		});
 		return this.viz;
 	}
