@@ -38,11 +38,15 @@ var VizPaneView = Backbone.View.extend({
 	initialize: function(){
 		var view = this;
 
+		this.$(".navbar-fixed-top").each(function(){
+			view.$el.css("margin-top",$(this).height());
+		});
+
 		var settingsView = new SettingsView({
 			model: this.model,
 			el: this.$("#settings")[0],
 		});
-		var overviewView = new OverviewView({
+		var textView = new TextView({
 			model: this.model,
 			el: this.$("#overview")[0],
 		});
@@ -124,23 +128,6 @@ var SettingsView = Backbone.View.extend({
 			var words = model.getWords(attr);
 			list.html(words.join(", "));
 		});
-	}
-});
-
-var OverviewView = Backbone.View.extend({
-	events:{
-
-	},
-	initialize:function(){
-		this.render();
-	},
-	render:function(){
-		var view = this;
-
-		var output = this.model.get("text");
-		// get each sentence and tie a view to it.
-		this.$el.html(output);
-		return this;
 	}
 });
 
