@@ -42,13 +42,21 @@ var VizPaneView = Backbone.View.extend({
 			model: this.model,
 			el: this.$("#settings")[0],
 		});
+		var overviewView = new OverviewView({
+			model: this.model,
+			el: this.$("#overview")[0],
+		});
+
+		this.render();
 
 		this.$(".nav-visualization .active a").each(function(){
 			view.makeViz($(this).data("type"));
 		});
 	},
 	render: function(){
-
+		this.$(".sidebar .pane").hide();
+		var targetId = this.$(".nav-sidebar .active a").data("target");
+		this.$("#"+targetId).show();
 	},
 	updateSidebar: function(event){
 		event.preventDefault();
@@ -56,9 +64,7 @@ var VizPaneView = Backbone.View.extend({
 		this.$(".nav-sidebar .active").removeClass("active");
 		$(event.currentTarget).parents("li:first").addClass("active");
 
-		this.$(".sidebar .pane").hide();
-		var targetId = $(event.currentTarget).data("target");
-		this.$("#"+targetId).show();
+		this.render();
 	},
 	updateViz: function(event){
 		event.preventDefault();
@@ -118,6 +124,23 @@ var SettingsView = Backbone.View.extend({
 			var words = model.getWords(attr);
 			list.html(words.join(", "));
 		});
+	}
+});
+
+var OverviewView = Backbone.View.extend({
+	events:{
+
+	},
+	initialize:function(){
+		this.render();
+	},
+	render:function(){
+		var view = this;
+
+		var output = this.model.get("text");
+		// get each sentence and tie a view to it.
+		this.$el.html(output);
+		return this;
 	}
 });
 
