@@ -47,3 +47,4 @@ var TextView = VizView.extend({
 		return true;
 	},
 });
+vizViewDict['text'] = TextView;

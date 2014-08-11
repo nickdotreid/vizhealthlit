@@ -71,13 +71,15 @@ var VizPaneView = Backbone.View.extend({
 	},
 	makeViz: function(type){
 		if(this.viz) this.viz.remove();
-		this.viz = new TextView({
+		if(!vizViewDict[type]) return false;
+		this.viz = new vizViewDict[type]({
 			model: this.model,
 			el: this.$("#chart")[0],
 		});
 		return this.viz;
 	}
 });
+var vizViewDict = {};
 
 var SettingsView = Backbone.View.extend({
 	events:{
