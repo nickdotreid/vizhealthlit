@@ -63,10 +63,15 @@ var TextView = Backbone.View.extend({
 		var html = this.$el.html();
 		var parts = html.split(item.text);
 
+		if(parts.length < 1){
+			return false;
+		}else if(parts.length > 2){
+			return false;
+		}
 		var formula = 'score';
 		if(parts[0]) this.$el.html(parts[0]);
 		this.$el.html(this.$el.html() + item.text + "<span class='score'>"+ "("+ formatNumber(item[formula]) +")" +"</span>");
-		if(parts[1]) this.$el.html(this.$el.html() + parts[1]);
+		this.$el.html(this.$el.html() + parts[1]);
 		return true;
 	},
 });
