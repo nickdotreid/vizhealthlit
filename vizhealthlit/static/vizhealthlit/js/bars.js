@@ -31,9 +31,10 @@ var BarsVizView = VizView.extend({
 				return score;
 			}
 		}
+		var view = this;
 		var model = this.model;
 		var first = true;
-		this.update = function(){
+		var update = function(){
 
 			var items = model.get("items");
 			if(!items) return;
@@ -148,7 +149,13 @@ var BarsVizView = VizView.extend({
 			});
 		}
 
-		this.update();
+		update();
+
+		this.stopListening(this.model);
+		this.listenTo(this.model,'updated',function(){
+			update();
+		});
+
 		var view = this;
 		chart.delegate('rect','click',function(){
 			if(display_paragraphs){
@@ -156,15 +163,12 @@ var BarsVizView = VizView.extend({
 			}else{
 				display_paragraphs = true;
 			}
-			view.update();
+			update();
 		});
 
 		return this;
 
 	},
-	update:function(){
-		alert("this should be overwritten");
-	}
 });
 
 vizViewDict['bars'] = BarsVizView;
