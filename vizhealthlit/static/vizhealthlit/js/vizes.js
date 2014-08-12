@@ -54,6 +54,10 @@ var TextView = VizView.extend({
 				var sentence = $(this);
 				if(model.get("highlight") == sentence.text()){
 					sentence.addClass("highlight");
+					$.smoothScroll({
+						scrollTarget: sentence,
+						scrollElement: view.$el,
+					});
 				}else if(sentence.hasClass("highlight")){
 					sentence.removeClass("highlight");
 				}
