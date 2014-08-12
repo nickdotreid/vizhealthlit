@@ -13,14 +13,6 @@ from vizform.models import Body
 def index(request):
     form = TextForm()
     form.helper.form_action = reverse(result)
-    return render_to_response('index.html',{
-        'form':form,
-        'settings_form':SettingsForm(),
-        },context_instance=RequestContext(request))
-
-def text(request):
-    form = TextForm()
-    form.helper.form_action = reverse(result)
 
     settings = SettingsForm()
     settings.helper.form_action = reverse(result)

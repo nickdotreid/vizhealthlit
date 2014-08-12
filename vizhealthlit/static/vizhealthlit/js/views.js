@@ -50,6 +50,10 @@ var VizPaneView = Backbone.View.extend({
 			model: this.model,
 			el: this.$("#overview")[0],
 		});
+		var topicView = new TopicsView({
+			model: this.model,
+			el: this.$("#topics")[0],
+		})
 
 		this.render();
 
@@ -128,6 +132,45 @@ var SettingsView = Backbone.View.extend({
 			var words = model.getWords(attr);
 			list.html(words.join(", "));
 		});
+	}
+});
+
+var TopicsView = Backbone.View.extend({
+	events:{
+		"mouseenter .topic-list a":"topicHover",
+		"click .topic-list a":"topicSelect",
+	},
+	initialize:function(){
+		this.render();
+	},
+	render: function(){
+		var output = "";
+		this.model.nouns().forEach(function(noun){
+			output += "<li><a href='#' data-noun='"+noun+"'>"+noun+"</a></li>";
+		});
+		this.$(".topic-list").html(output);
+	},
+	topicHover: function(event){
+		var link = $(event.currentTarget);
+		var model = this.model;
+		model.addWord(link.data("noun"));
+		link.bind('mouseleave',function(){
+			link.unbind('mouseleave');
+			if(link.parent().hasClass("active")) return;
+			model.removeWord(link.data("noun"));
+		});
+	},
+	topicSelect: function(event){
+		event.preventDefault();
+		var link = $(event.currentTarget);
+		var model = this.model;
+		if(link.parent().hasClass("active")){
+			link.parent().removeClass("active");
+			model.removeWord(link.data("noun"));
+		}else{
+			link.parent().addClass("active");
+			model.addWord(link.data("noun"));
+		}	
 	}
 });
 

@@ -5,6 +5,17 @@ var TextModel = Backbone.Model.extend({
 			model.generateScores();
 		});
 	},
+	nouns: function(){
+		var nouns = this.get("nouns");
+		if(!nouns) return [];
+		nouns = _.sortBy(nouns, function(n){
+			return n.count;
+		});
+		nouns = _.map(nouns, function(noun){
+			return noun.text;
+		});
+		return _.first(nouns.reverse(),10);
+	},
 	getSentences: function(){
 		var items = this.get("items");
 		if(!items) return [];
@@ -33,6 +44,7 @@ var TextModel = Backbone.Model.extend({
 			positiveness_weight:this.get('positiveness_weight'),
 			acitveness_weight:this.get('acitveness_weight'),
 			directness_weight:this.get('directness_weight'),
+			words:this.words(),
 		};
 	},
 	generateScores: function(){
@@ -115,5 +127,29 @@ var TextModel = Backbone.Model.extend({
 			this.unset("highlight");
 			this.trigger("unhighlight");
 		}
-	}
+	},
+	addWord: function(word){
+		var words = this.get("words");
+		if(!words) words=[];
+		if(words.indexOf(word) == -1){
+			words.push(word);
+			this.set("words",words);
+			this.generateScores();
+		}
+		return this;
+	},
+	removeWord: function(word){
+		var words = this.get("words");
+		if(!words) return this;
+		if(words.indexOf(word) == -1) return this;
+		words = _.without(words,word);
+		this.set("words",words);
+		this.generateScores();
+		return this;
+	},
+	words: function(){
+		var words = this.get("words")
+		if(!words) return [];
+		return words;
+	},
 });
