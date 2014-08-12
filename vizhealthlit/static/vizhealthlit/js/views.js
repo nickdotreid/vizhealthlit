@@ -166,16 +166,22 @@ var TopicsView = Backbone.View.extend({
 		var model = this.model;
 		model.nouns().forEach(function(noun){
 			var listItem = $("<li><a href='#'>"+noun.text+"</a></li>").appendTo(this.$('.topic-list'));
+			var timeout = false;
 			listItem.bind('mouseenter', function(event){
-				model.addWord(noun);
+				timeout = setTimeout(function(){
+					timeout = false;
+					model.addWord(noun);
+				}, 500);
 				listItem.bind('mouseleave',function(){
-					listItem.unbind('mouseleave');
-					if(listItem.hasClass("active")) return;
-					model.removeWord(noun);
-				});
+						if(timeout) clearTimeout(timeout);
+						listItem.unbind('mouseleave');
+						if(listItem.hasClass("active")) return;
+						model.removeWord(noun);
+					});
 			});
 			listItem.bind('click',function(event){
 				event.preventDefault();
+				if(timeout) clearTimeout(timeout);
 				if(listItem.hasClass("active")){
 					listItem.removeClass("active");
 					model.removeWord(noun);
