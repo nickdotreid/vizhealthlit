@@ -18,6 +18,7 @@ var UploadView = Backbone.View.extend({
 		event.preventDefault();
 		var view = this;
 		var form = this.$('form');
+		if(form.hasClass("loading")) return;
 		this.$el.addClass("loading");
 
 		$.ajax({

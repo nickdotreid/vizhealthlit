@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Div, Submit, Fieldset
+from crispy_forms.layout import Layout, Div, Submit, Fieldset, HTML
 
 from crispy_forms.utils import render_crispy_form
 
@@ -22,6 +22,7 @@ class TextForm(forms.Form):
         self.helper.layout = Layout(
             'text',
             Submit('submit', 'Submit'),
+            Div(HTML("Loading"), css_class="loading-sign"),
             )
 
     text = forms.CharField(label="The text you want to visualize", required=True, widget=forms.Textarea)

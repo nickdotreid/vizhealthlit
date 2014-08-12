@@ -6129,6 +6129,27 @@ button.close {
     display: none !important;
   }
 }
+form .loading-sign {
+  display: none;
+}
+form .btn-primary {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+}
+form textarea {
+  display: block;
+  width: 100%;
+}
+.loading form .loading-sign {
+  margin-top: 7px;
+  display: block;
+  background-color: #CCC;
+  text-align: center;
+}
+.loading form .btn {
+  display: none;
+}
 .words-hightlight .highlight {
   color: #FFF;
   background-color: #000000;
