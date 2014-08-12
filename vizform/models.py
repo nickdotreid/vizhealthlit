@@ -20,6 +20,18 @@ from nltk.corpus import cmudict
 
 sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 
+pos_ws = []
+f = open('vizform/positive-words.txt', 'r')
+
+for l in f.readlines()[35:]:
+    pos_ws.append(unicode(l.strip()))
+f.close()
+
+neg_ws = []
+f = open('vizform/negative-words.txt', 'r')
+for l in f.readlines()[35:]:
+    neg_ws.append(unicode(l.strip()))
+
 from readability.readability import Readability
 
 class Noun():
@@ -138,6 +150,10 @@ class Sentence(models.Model):
                 'MD',
                 ]:
                 self.indirect_words.append(w)
+            if w in pos_ws:
+                self.positive_words.append(w)
+            if w in neg_ws:
+                self.negative_words.append(w)
 
 
         for n in self.nouns:
