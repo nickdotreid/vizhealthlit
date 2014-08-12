@@ -29,7 +29,21 @@
 
 {% block content %}
 <div id="upload-pane" class="pane upload-pane">
-{% crispy form %}
+	<div class="row">
+		<div class="col-sm-6">
+			<ul class="nav nav-pills nav-stacked">
+			{% for text in texts%}
+			<li>
+				<a href="#" class="text">{{text.title}}</a>
+				<div class="text" style="display:none;">{{text.text|safe}}</div>
+			</li>
+			{% endfor %}
+			</ul>
+		</div>
+		<div class="col-sm-6">
+			{% crispy form %}
+		</div>
+	</div>
 </div>
 <div id="viz-pane" class="pane row">
 	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">

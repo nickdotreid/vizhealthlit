@@ -9,6 +9,7 @@ from vizform.forms import TextForm, SettingsForm
 from crispy_forms.utils import render_crispy_form
 
 from vizform.models import Body
+from texts.models import Text
 
 def index(request):
     form = TextForm()
@@ -20,6 +21,7 @@ def index(request):
     return render_to_response('text.html',{
         'form':form,
         'settings':settings,
+        'texts':Text.objects.filter(hidden=False).all()
         }, context_instance=RequestContext(request))
 
 def result(request):

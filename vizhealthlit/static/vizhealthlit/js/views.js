@@ -3,6 +3,16 @@ var UploadView = Backbone.View.extend({
 	className: "text-upload",
 	events:{
 		"submit form": "updateText",
+		"click a.text": "loadText",
+	},
+	loadText: function(event){
+		event.preventDefault();
+		this.$('li.active').removeClass("active");
+		var text = $(event.currentTarget);
+		text.parent().addClass("active");
+		var text_value = $(".text:not(a)",text.parent()).text();
+		this.$('form [name=text]').val(text_value);
+		this.$('form').submit();
 	},
 	updateText: function(event){
 		event.preventDefault();
