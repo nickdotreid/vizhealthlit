@@ -16,6 +16,7 @@ var VizView = Backbone.View.extend({
 var TextView = VizView.extend({
 	render: function(){
 		this.updateHeight();
+		this.$el.addClass('words-hightlight');
 		this.$el.css("overflow","auto");
 		this.stopListening(this.model,"highlight");
 

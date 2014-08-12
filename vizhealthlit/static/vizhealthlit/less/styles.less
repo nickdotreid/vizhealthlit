@@ -3,11 +3,19 @@
 @icon-font-path: "../../bootstrap/fonts/";
 @import 'bootstrap.less';
 
-#viz-pane{
-	.words{
-		color:#666;
-		.highlighted{
-			color:#000;
-		}
+
+.words-hightlight{
+	.highlight{
+		color:#FFF;
+		background-color: #000000;
 	}
 }
+
+.formulas span{
+	display:none;
+}
+.formulas .active span{
+	display:block;
+	float:right;
+}
+
