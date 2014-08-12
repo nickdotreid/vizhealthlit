@@ -36,9 +36,14 @@ var TextView = VizView.extend({
 
 		this.$(".sentence").each(function(){
 			var sentence = $(this);
+			var timeout = false;
 			sentence.hover(function(){
-				model.highlight($(this).text());
+				var text = $(this).text();
+				timeout = setTimeout(function(){
+					model.highlight(text);
+				}, 500);
 			},function(){
+				if(timeout) clearTimeout(timeout);
 				model.unhighlight($(this).text());
 			});
 		});

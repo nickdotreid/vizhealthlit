@@ -173,11 +173,11 @@ var TopicsView = Backbone.View.extend({
 					model.addWord(noun);
 				}, 500);
 				listItem.bind('mouseleave',function(){
-						if(timeout) clearTimeout(timeout);
-						listItem.unbind('mouseleave');
-						if(listItem.hasClass("active")) return;
-						model.removeWord(noun);
-					});
+					if(timeout) clearTimeout(timeout);
+					listItem.unbind('mouseleave');
+					if(listItem.hasClass("active")) return;
+					model.removeWord(noun);
+				});
 			});
 			listItem.bind('click',function(event){
 				event.preventDefault();

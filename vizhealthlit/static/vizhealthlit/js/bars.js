@@ -165,7 +165,9 @@ var BarsVizView = VizView.extend({
 		});
 
 		var view = this;
+		var timeout = false;
 		chart.delegate('rect','click',function(){
+			if(timeout) clearTimeout(timeout);
 			if(display_paragraphs){
 				display_paragraphs = false;
 			}else{
@@ -173,10 +175,14 @@ var BarsVizView = VizView.extend({
 			}
 			update();
 		}).delegate('rect','mouseenter',function(){
-			d3.select(this).each(function(d){
-				model.highlight(d.text);
-			});
+			var element = d3.select(this);
+			timeout = setTimeout(function(){
+				element.each(function(d){
+					model.highlight(d.text);
+				});
+			}, 500);
 		}).delegate('rect','mouseleave',function(){
+			if(timeout) clearTimeout();
 			d3.select(this).each(function(d){
 				model.unhighlight(d.text);
 			});

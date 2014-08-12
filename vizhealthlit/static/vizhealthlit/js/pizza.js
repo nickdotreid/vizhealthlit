@@ -304,7 +304,7 @@ var PizzaVizView = VizView.extend({
 						item.each(function(d){
 							model.highlight(d.text);
 						});
-					},150);
+					},500);
 				}, function(){
 					var item = d3.select(this);
 					if(timeout){
