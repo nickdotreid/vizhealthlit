@@ -46,11 +46,7 @@ class SettingsForm(forms.Form):
                 "activeness_weight",
                 ),
             Fieldset(
-                "Directness",
-                "directness_weight",
-                ),
-            Fieldset(
-                "Complexity",
+                "Length",
                 'complexity_weight',
                 'sentence_length_threshold',
                 'paragraph_length_threshold',
