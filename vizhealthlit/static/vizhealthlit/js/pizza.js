@@ -298,15 +298,32 @@ var PizzaVizView = VizView.extend({
 				$(this).unbind("mouseenter").unbind("mouseleave");
 				var timeout = false;
 				$(this).hover(function(){
+					var item = d3.select(this);
 					timeout = setTimeout(function(){
 						timeout = false;
-//						hoverSentence(d);
+						item.each(function(d){
+							model.highlight(d.text);
+						});
 					},150);
 				}, function(){
+					var item = d3.select(this);
 					if(timeout){
 						clearTimeout(timeout);
 					}else{
-//						clearSentence(d);
+						item.each(function(d){
+							model.unhighlight(d.text);
+						});
+					}
+				});
+			});
+
+			view.stopListening(model,'highlight');
+			view.listenTo(model,'highlight unhighlight',function(){
+				d3.selectAll("path").each(function(d){
+					if(d.text == model.get("highlight")){
+						d3.select(this).attr("stroke","black");
+					}else{
+						d3.select(this).attr("stroke","white");
 					}
 				});
 			});
