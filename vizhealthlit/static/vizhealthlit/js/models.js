@@ -52,8 +52,11 @@ var TextModel = Backbone.Model.extend({
 		var settings = this.getSettings();
 		var items = this.get("items");
 		if(!items) return false;
+		var score = function(){
+			return 0;
+		}
 		if(items[0][settings['formula']]){
-			function score(d, type){
+			score = function(d, type){
 				d.score = d[settings['formula']];
 			}
 		}else{
@@ -63,7 +66,7 @@ var TextModel = Backbone.Model.extend({
 			if(!settings['acitveness_weight']) settings['acitveness_weight'] = 1;
 			if(!settings['directness_weight']) settings['directness_weight'] = 1;
 
-			function score(d, type){
+			score = function(d, type){
 				d.score = 0;
 				if(d.sentences) d.sentences.forEach(function(s){ d.score += s.score; });
 
