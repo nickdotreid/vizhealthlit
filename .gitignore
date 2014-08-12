@@ -6,6 +6,7 @@
 *.pyo
 .bzr
 .bzrignore
+*.db
 Thumbs.db
 /dist
 /build
