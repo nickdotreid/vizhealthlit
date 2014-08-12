@@ -144,6 +144,17 @@ var BarsVizView = VizView.extend({
 				}
 				if(display_paragraphs) xpos += barWidth;
 			});
+			
+			view.stopListening(model,'highlight');
+			view.listenTo(model,'highlight unhighlight',function(){
+				d3.selectAll("rect").each(function(d){
+					if(d.text == model.get("highlight")){
+						d3.select(this).attr("stroke","black").attr("stroke-width",2);
+					}else{
+						d3.select(this).attr("stroke","white").attr("stroke-width",0);
+					}
+				});
+			});
 		}
 
 		update();
@@ -161,6 +172,14 @@ var BarsVizView = VizView.extend({
 				display_paragraphs = true;
 			}
 			update();
+		}).delegate('rect','mouseenter',function(){
+			d3.select(this).each(function(d){
+				model.highlight(d.text);
+			});
+		}).delegate('rect','mouseleave',function(){
+			d3.select(this).each(function(d){
+				model.unhighlight(d.text);
+			});
 		});
 
 		return this;
