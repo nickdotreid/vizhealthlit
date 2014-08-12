@@ -5,11 +5,8 @@ var BarsVizView = VizView.extend({
 	render:function(){
 		var display_paragraphs = true;
 
+		this.updateHeight();
 		var chart = this.$el;
-		var navBarHeights = _.reduce($(".navbar"), function(num, div){
-			return $(div).height() + num;
-		}, 0);
-		chart.height($(window).height() - navBarHeights);
 		var svg = d3.select(this.el).append("svg:svg")
 			.attr("width", chart.width())
 			.attr("height", chart.height());

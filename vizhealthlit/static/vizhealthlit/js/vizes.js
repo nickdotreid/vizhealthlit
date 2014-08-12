@@ -4,12 +4,19 @@ var VizView = Backbone.View.extend({
 		this.setElement(el[0]);
 		this.listenTo(this.model, "updated", this.update);
 		this.render();
+	},
+	updateHeight: function(){
+		var navBarHeights = _.reduce($(".navbar:visible"), function(num, div){
+			return $(div).height() + num;
+		}, 0);
+		this.$el.height($(window).height() - navBarHeights);
 	}
 });
 
 var TextView = VizView.extend({
 	render: function(){
-
+		this.updateHeight();
+		this.$el.css("overflow","auto");
 		this.stopListening(this.model,"highlight");
 
 		var view = this;
