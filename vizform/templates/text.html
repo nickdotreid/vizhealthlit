@@ -14,11 +14,11 @@
 
 		uploadView.on("uploaded",function(){
 			$("#upload-pane").hide();
-			$("#viz-pane").show();
+			var pane = $("#viz-pane").clone().insertBefore("#viz-pane").show();
 
 			var vizPane = new VizPaneView({
 				model:text,
-				el:$("#viz-pane")[0],
+				el:pane[0],
 			})
 		});
 		$("#upload-pane").show();
@@ -61,6 +61,9 @@
 					<li class="active"><a href="#text" data-type="text">Text</a></li>
 					<li class=""><a href="#bars" data-type="bars">Bar Chart</a></li>
 					<li class=""><a href="#pizza" data-type="pizza">Pizza</a></li>
+				</ul>
+				<ul class="nav navbar-nav pull-right">
+					<li><a href="#" class="kill pull-right">Back</a></li>
 				</ul>
 			</div>
 		</div>

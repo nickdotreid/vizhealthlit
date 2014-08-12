@@ -44,6 +44,7 @@ var VizPaneView = Backbone.View.extend({
 	events:{
 		"click .nav-visualization a":"updateViz",
 		"click .nav-sidebar a":"updateSidebar",
+		"click .kill":"killViz",
 	},
 	initialize: function(){
 		var view = this;
@@ -101,6 +102,12 @@ var VizPaneView = Backbone.View.extend({
 			el: this.$("#chart")[0],
 		});
 		return this.viz;
+	},
+	killViz: function(event){
+		event.preventDefault();
+		$("#upload-pane").show();
+		$("#viz-pane").hide();
+		this.remove();
 	}
 });
 var vizViewDict = {};
