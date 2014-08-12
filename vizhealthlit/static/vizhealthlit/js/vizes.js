@@ -104,7 +104,7 @@ function makeColors(items, settings){
 
 	if(settings['words'] && settings['words'].length > 0){
 		hue = 21;
-		saturationKey = 'wordScore';
+		saturationKey = 'wordCount';
 	}
 
 	var brightness = d3.scale.linear()

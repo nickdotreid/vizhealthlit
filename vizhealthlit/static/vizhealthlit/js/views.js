@@ -144,33 +144,35 @@ var TopicsView = Backbone.View.extend({
 		this.render();
 	},
 	render: function(){
-		var output = "";
-		this.model.nouns().forEach(function(noun){
-			output += "<li><a href='#' data-noun='"+noun+"'>"+noun+"</a></li>";
-		});
-		this.$(".topic-list").html(output);
-	},
-	topicHover: function(event){
-		var link = $(event.currentTarget);
+		// remove any existing listeners
+		this.$(".topic-list").html("");
 		var model = this.model;
-		model.addWord(link.data("noun"));
-		link.bind('mouseleave',function(){
-			link.unbind('mouseleave');
-			if(link.parent().hasClass("active")) return;
-			model.removeWord(link.data("noun"));
+		model.nouns().forEach(function(noun){
+			var listItem = $("<li><a href='#'>"+noun.text+"</a></li>").appendTo(this.$('.topic-list'));
+			listItem.bind('mouseenter', function(event){
+				model.addWord(noun);
+				listItem.bind('mouseleave',function(){
+					listItem.unbind('mouseleave');
+					if(listItem.hasClass("active")) return;
+					model.removeWord(noun);
+				});
+			});
+			listItem.bind('click',function(event){
+				event.preventDefault();
+				if(listItem.hasClass("active")){
+					listItem.removeClass("active");
+					model.removeWord(noun);
+				}else{
+					listItem.addClass("active");
+					model.addWord(noun);
+				}	
+			});
+
 		});
+		
 	},
 	topicSelect: function(event){
-		event.preventDefault();
-		var link = $(event.currentTarget);
-		var model = this.model;
-		if(link.parent().hasClass("active")){
-			link.parent().removeClass("active");
-			model.removeWord(link.data("noun"));
-		}else{
-			link.parent().addClass("active");
-			model.addWord(link.data("noun"));
-		}	
+
 	}
 });
 

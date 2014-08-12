@@ -11,9 +11,6 @@ var TextModel = Backbone.Model.extend({
 		nouns = _.sortBy(nouns, function(n){
 			return n.count;
 		});
-		nouns = _.map(nouns, function(noun){
-			return noun.text;
-		});
 		return _.first(nouns.reverse(),10);
 	},
 	getSentences: function(){
@@ -83,11 +80,23 @@ var TextModel = Backbone.Model.extend({
 			}
 		}
 
+		function wordInWords(word, words){
+			return _.reduce(words, function(bool, w){
+				if(bool) return bool;
+				if(word.toLowerCase() == w.toLowerCase()) return true;
+				return bool;
+			}, false);
+		}
+
 		function wordCount(d){
 			d.wordCount = 0;
 			if(!settings.words || settings.words.length < 1) return;
 			d.words.forEach(function(w){
-				if(settings.words.indexOf(w) >= 0) d.wordCount++;
+				if(_.reduce(settings.words, function(bool, noun){
+					if(bool) return bool;
+					if(wordInWords(w,noun.words)) return true;
+					return false;
+				}, false)) d.wordCount++;
 			});
 		}
 
