@@ -1,7 +1,7 @@
 var TextModel = Backbone.Model.extend({
 	initialize:function(){
 		var model = this;
-		this.on("change",function(){
+		this.on("change:formula change:items",function(eventName){
 			model.generateScores();
 		});
 	},
@@ -105,5 +105,15 @@ var TextModel = Backbone.Model.extend({
 		return _.sortBy(_.keys(words), function(w){
 			return words[w];
 		});
+	},
+	highlight: function(text){
+		this.set("highlight",text);
+		this.trigger("highlight");
+	},
+	unhighlight: function(text){
+		if(this.get('highlight') == text){
+			this.unset("highlight");
+			this.trigger("unhighlight");
+		}
 	}
 });

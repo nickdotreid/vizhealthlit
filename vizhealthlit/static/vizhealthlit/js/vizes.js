@@ -9,11 +9,47 @@ var VizView = Backbone.View.extend({
 
 var TextView = VizView.extend({
 	render: function(){
+
+		this.stopListening(this.model,"highlight");
+
 		var view = this;
+		var model = this.model;
 		this.$el.html(this.model.get("text"));
 		this.model.get("items",[]).forEach(function(item){
 			view.scoreGroup(item);
 		});
+		this.$('.score:not(.paragraph-score)').each(function(){
+			var sentence = $(this);
+			sentence.hover(function(){
+				model.highlight()
+			}, function(){
+
+			});
+		});
+
+		this.$(".sentence").each(function(){
+			var sentence = $(this);
+			sentence.hover(function(){
+				model.highlight($(this).text());
+			},function(){
+				model.unhighlight($(this).text());
+			});
+		});
+
+		view.listenTo(model,'highlight',function(){
+			this.$(".sentence").each(function(){
+				var sentence = $(this);
+				if(model.get("highlight") == sentence.text()){
+					sentence.addClass("highlight");
+				}else if(sentence.hasClass("highlight")){
+					sentence.removeClass("highlight");
+				}
+			});
+		});
+		this.listenTo(model,'unhighlight', function(){
+			view.$(".sentence").removeClass("highlight");
+		});
+
 		return this;
 	},
 	update: function(){
@@ -42,8 +78,12 @@ var TextView = VizView.extend({
 		}
 		var formula = 'score';
 		if(parts[0]) this.$el.html(parts[0]);
-		this.$el.html(this.$el.html() + item.text + "<span class='score'>"+ "("+ formatNumber(item[formula]) +")" +"</span>");
+		this.$el.html(this.$el.html() + '<span class="sentence">'+ item.text+ '</span>' + "<span class='score'>"+ "("+ formatNumber(item[formula]) +")" +"</span>");
 		this.$el.html(this.$el.html() + parts[1]);
+
+		var model = this.model;
+		var element = this.$(".sentence:last");
+
 		return true;
 	},
 });
