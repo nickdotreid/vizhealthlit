@@ -30,7 +30,11 @@
 {% block content %}
 <div id="upload-pane" class="pane upload-pane">
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-4">
+			<p>Hi, welcome to the VizHealthLit project.</p>
+			<p>To view a text visualization select an existing text, or enter your own text.</p>
+		</div>
+		<div class="col-sm-4">
 			<ul class="nav nav-pills nav-stacked">
 			{% for text in texts%}
 			<li>
@@ -40,7 +44,7 @@
 			{% endfor %}
 			</ul>
 		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-4">
 			{% crispy form %}
 		</div>
 	</div>
